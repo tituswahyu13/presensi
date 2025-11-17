@@ -1,0 +1,22 @@
+{
+  "name": "PresPAM",
+  "short_name": "PresPAM",
+  "start_url": "auth/login.php",
+  "scope": "/", 
+  "display": "standalone",  
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "description": "Aplikasi kehadiran",
+  "icons": [
+    {
+      "src": "icons/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/load.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

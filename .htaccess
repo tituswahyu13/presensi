@@ -1,0 +1,28 @@
+RewriteEngine On
+
+ErrorDocument 404 /errors/404.php
+ErrorDocument 403 /errors/403.php
+
+<Files .htaccess>
+  Order allow,deny
+  Deny from all
+</Files>
+
+<Files config.php>
+  Order allow,deny
+  Deny from all
+</Files>
+
+Options -Indexes
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/auth/login.php [NC]
+RewriteCond %{REQUEST_URI} !^/errors/ [NC]
+RewriteCond %{REQUEST_URI} !^/public/ [NC]
+RewriteRule ^(.*)$ /auth/login.php [L,R=302]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.php?$1 [L,QSA]
+
