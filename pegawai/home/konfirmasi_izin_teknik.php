@@ -178,286 +178,124 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
 ?>
 
 <style>
-    /* Variabel warna */
-    :root {
-        --primary-color: #4a90e2;
-        /* Warna biru yang lebih cerah */
-        --primary-hover: #357ab8;
-        /* Warna biru gelap saat hover */
-        --secondary-color: #7f8c8d;
-        /* Warna abu-abu */
-        --success-color: #2ecc71;
-        /* Warna hijau */
-        --danger-color: #e74c3c;
-        /* Warna merah */
-        --warning-color: #f39c12;
-        /* Warna oranye */
-        --background-light: #ffffff;
-        /* Warna latar belakang putih */
-        --border-color: #bdc3c7;
-        /* Warna border */
-        --text-dark: #2c3e50;
-        /* Warna teks gelap */
-        --text-muted: #95a5a6;
-        /* Warna teks pudar */
-    }
-
-    .page-body {
-        padding: 20px;
-        background-color: var(--background-light);
-    }
-
-    .container-xl {
-        background-color: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    }
-
-    .btn {
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary {
-        background: var(--primary-color);
-        border: none;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-        background: var(--secondary-color);
-        border: none;
-    }
-
-    .btn-secondary:hover {
-        background: var(--secondary-hover);
-    }
-
+    /* Tambahkan CSS yang diperlukan agar konsisten dengan tema header.php */
     .table {
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: none;
-        /* Menghapus bayangan untuk tampilan minimalis */
+        /* Memastikan border collapse untuk kontrol border yang lebih baik */
+        border-collapse: separate; 
+        border-spacing: 0;
+        /* Border luar tabel */
+        border: 1px solid var(--border-color); 
+        border-radius: 8px; /* Sudut membulat */
+        overflow: hidden; /* Penting untuk menjaga border-radius */
+        width: 100%;
+        color: var(--text-color);
     }
-
+    
     .table thead th {
-        background-color: var(--primary-color);
-        color: white;
-        font-weight: 500;
+        /* Mengambil warna dari primary color yang didefinisikan di header.php */
+        background-color: var(--primary-color); 
+        color: var(--bg-color); /* Ubah warna teks menjadi warna latar belakang dark mode */
+        font-weight: 700;
         border: none;
         padding: 12px;
+        /* Menambahkan border di sisi kanan untuk memisahkan kolom */
+        border-right: 1px solid rgba(0, 0, 0, 0.2); 
+    }
+    
+    .table thead th:last-child {
+        border-right: none; /* Hapus border di kolom terakhir header */
     }
 
-    .table tbody tr {
-        background-color: transparent;
-        /* Menghapus warna latar belakang baris tabel */
+    .table tbody tr:nth-child(even) {
+        background-color: rgba(18, 18, 25, 0.5); /* Menggunakan warna dark transparan yang sedikit lebih pekat */
     }
 
+    .table tbody tr:nth-child(odd) {
+        background-color: rgba(18, 18, 25, 0.2); /* Menggunakan warna dark transparan yang lebih terang */
+    }
+    
     .table tbody td {
-        background-color: transparent;
-        /* Menghapus warna latar belakang sel tabel */
-        border: none;
-        /* Menghapus border untuk tampilan lebih bersih */
-    }
-
-    /* Badge styles */
-    .badge {
+        /* Menambahkan border di sisi kanan untuk memisahkan kolom data */
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
         padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: 500;
     }
 
-    .badge.bg-success {
-        background-color: var(--success-color) !important;
+    .table tbody tr:last-child td {
+        border-bottom: none; /* Hapus border bawah di baris terakhir */
     }
 
-    .badge.bg-primary {
-        background-color: var(--primary-color) !important;
+    .table tbody td:last-child {
+        border-right: none; /* Hapus border di kolom terakhir data */
     }
 
-    .badge.bg-secondary {
-        background-color: var(--secondary-color) !important;
-    }
 
-    /* Status colors */
-    span[style*="color: red"] {
-        color: var(--danger-color) !important;
-    }
-
-    /* Input groups */
-    .input-group {
-        box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .input-group input {
-        border: 1px solid var(--border-color);
-        padding: 10px;
-    }
-
-    .input-group input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    /* Modal styling */
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-    }
-
-    .modal-header {
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 15px 15px 0 0;
-        border-bottom: none;
-    }
-
-    .modal-body {
+    /* Mengganti styling yang dihapus dari blok style sebelumnya */
+    .page-body {
         padding: 20px;
+        background-color: var(--bg-color); /* Menggunakan warna latar belakang dari header */
+        color: var(--text-color);
     }
-
-    /* Date display */
+    .container-xl {
+        background-color: var(--card-bg); /* Menggunakan warna card/bg transparan dari header */
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px var(--glow-color); /* Efek glow konsisten */
+    }
+    .action-buttons, .search-container {
+        background-color: rgba(0, 0, 0, 0.2); /* Sedikit gelap untuk kontras */
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+    }
+    /* Mengubah warna tombol agar sesuai dengan tema header */
+    .btn-primary {
+        background: var(--primary-color);
+        color: var(--bg-color);
+        border: 1px solid var(--primary-color);
+        box-shadow: 0 0 5px var(--glow-color);
+    }
+    .btn-primary:hover {
+        background: var(--secondary-color);
+        box-shadow: 0 0 8px var(--secondary-color);
+    }
+    /* Mengubah warna teks merah agar kontras di dark mode */
+    .text-center span[style*="color: red"] {
+        color: #ff6b6b !important; /* Merah terang */
+    }
+    
     .date-display {
-        color: var(--text-muted);
+        color: var(--text-color);
         font-size: 0.95rem;
         margin: 15px 0;
     }
-
-    /* Foto column */
-    .foto-column img {
-        border-radius: 10px;
-        box-shadow: none;
-        /* Menghapus bayangan untuk tampilan minimalis */
-        transition: transform 0.3s ease;
+    /* Memastikan input-group tetap terlihat bagus */
+    .input-group input, .date-filter input[type="date"] {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
     }
 
-    .foto-column img:hover {
-        transform: scale(1.05);
-        box-shadow: none;
-        /* Menghapus bayangan saat hover */
+    /* Penyesuaian Badge Status untuk Dark Theme (menggunakan inline style selector yang sudah ada) */
+    .badge[style*="orange"] {
+        background-color: #ffc107 !important; /* Kuning/Orange terang */
+        color: var(--bg-color) !important;
+        font-weight: 700;
+    }
+    .badge[style*="#dc3545"] {
+        background-color: #e74c3c !important; /* Merah terang/Danger */
+        color: #fff !important;
+        font-weight: 700;
+    }
+    .badge.bg-success {
+        background-color: var(--primary-color) !important; /* Menggunakan primary-color (neon) untuk success */
+        color: var(--bg-color) !important;
+        font-weight: 700;
     }
 
-    /* Action buttons container */
-    .action-buttons {
-        background-color: #f8fafc;
-        padding: 15px;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    /* Filter buttons container */
-    .filter-buttons {
-        background-color: #f8fafc;
-        padding: 10px;
-        border-radius: 10px;
-        display: flex;
-        gap: 8px;
-    }
-
-    .foto-column img {
-        transition: transform 0.3s ease;
-        cursor: pointer;
-    }
-
-    .foto-column img:hover {
-        transform: scale(1.1);
-    }
-
-    .badge {
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: 500;
-    }
-
-    .input-group {
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-        border-radius: 8px;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    .input-group input {
-        border: 1px solid #dee2e6;
-        padding: 10px;
-    }
-
-    .modal-content {
-        border-radius: 15px;
-    }
-
-    .modal-header {
-        background-color: #4361ee;
-        color: white;
-        border-radius: 15px 15px 0 0;
-    }
-
-    .modal-body {
-        padding: 20px;
-    }
-
-    /* Tambahkan CSS baru untuk tombol */
-    .action-buttons .btn {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .filter-buttons {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .filter-buttons .btn {
-        min-width: 90px;
-        white-space: nowrap;
-    }
-
-    .search-container {
-        margin-top: 15px;
-    }
-
-    .search-container .input-group {
-        max-width: 100%;
-    }
-
-    .date-filter {
-        flex-direction: column;
-    }
-
-    .date-filter input[type="date"] {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .export-btn {
-        width: 100%;
-        margin-bottom: 15px;
-    }
-
-    .badge-pill {
-        padding: 8px 12px;
-        text-decoration: none;
-        margin: 0 3px;
-        font-size: 12px;
-    }
-
-    .badge-pill:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-    }
-
-    /* Tombol aksi checklist dan silang */
+    /* Styling tombol aksi (checklist dan silang) */
     .btn-aksi {
         display: inline-flex;
         align-items: center;
@@ -469,40 +307,36 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
         border-radius: 50%;
         margin: 0 4px;
         transition: background 0.2s, transform 0.2s;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important;
         cursor: pointer;
     }
     .btn-aksi.check {
-        background: #2ecc71;
-        color: #fff;
+        background: var(--primary-color) !important;
+        color: var(--bg-color) !important;
     }
     .btn-aksi.check:hover {
-        background: #27ae60;
-        transform: scale(1.08);
+        background: var(--secondary-color) !important;
     }
     .btn-aksi.cross {
-        background: #e74c3c;
-        color: #fff;
+        background: var(--danger-color) !important;
+        color: #fff !important;
     }
     .btn-aksi.cross:hover {
-        background: #c0392b;
-        transform: scale(1.08);
+        background: #c0392b !important;
     }
-    .btn-aksi.check span {
-        color: #009e2f;
-        font-weight: bold;
-        font-size: 1.4rem;
+
+    /* Mengubah warna stroke SVG untuk menyesuaikan tema */
+    .btn-aksi.check svg path {
+        /* Menggunakan warna latar belakang tombol untuk stroke */
+        stroke: var(--bg-color) !important; 
     }
-    .btn-aksi.cross span {
-        color: #d90429;
-        font-weight: bold;
-        font-size: 1.4rem;
+    .btn-aksi.cross svg line {
+        stroke: #fff !important;
     }
 </style>
 
 <div class="page-body">
     <div class="container-xl">
-        <!-- Bagian Export dan Filter Tanggal -->
         <div class="action-buttons">
             <div class="col-md-12">
                 <form method="GET" class="date-filter">
@@ -515,7 +349,6 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
             </div>
         </div>
 
-        <!-- Bagian Filter dan Pencarian -->
         <div class="row align-items-center">
             <div class="col-md-12">
                 <form method="GET" class="search-container">
@@ -529,7 +362,6 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
             </div>
         </div>
 
-        <!-- Tampilan tanggal -->
         <div class="date-display mb-3">
             <?php if (empty($_GET['tanggal_dari'])) : ?>
                 <span class="text-muted">Pengajuan Izin Tanggal: <?= date('d F Y') ?></span>
@@ -547,8 +379,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                     <th>Jam</th>
                     <th>Keterangan</th>
                     <th>Status</th>
-                    <th>Aksi</th> <!-- Tambahkan kolom Aksi -->
-                </tr>
+                    <th>Aksi</th> </tr>
             </thead>
             <tbody>
                 <?php
@@ -566,10 +397,13 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                     // Status
                     $status = $row['status'];
                     if (is_null($status)) {
-                        echo '<td><span class="badge" style="background-color: orange;">Pending</span></td>';
+                        // Menggunakan inline style untuk dicocokkan oleh CSS override
+                        echo '<td><span class="badge" style="background-color: orange;">Pending</span></td>'; 
                     } elseif ($status == '0') {
-                        echo '<td><span class="badge" style="background-color: #dc3545;">Ditolak</span></td>';
+                        // Menggunakan inline style untuk dicocokkan oleh CSS override
+                        echo '<td><span class="badge" style="background-color: #dc3545;">Ditolak</span></td>'; 
                     } elseif ($status == '1') {
+                        // Menggunakan class bg-success yang sudah dimapping ke primary-color (neon)
                         echo '<td><span class="badge bg-success">Diterima</span></td>';
                             } else {
                         echo '<td>' . htmlspecialchars($status) . '</td>';
@@ -583,7 +417,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                         echo '<input type="hidden" name="terima_tanggal" value="' . htmlspecialchars($row['tanggal_absen']) . '">';
                         echo '<button type="submit" class="btn-aksi check" title="Terima">'
                             . '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">'
-                            . '<path d="M6 12.5L10 16.5L16 7.5" stroke="#009e2f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+                            . '<path d="M6 12.5L10 16.5L16 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
                             . '</svg>'
                             . '</button>';
                         echo '</form>';
@@ -593,8 +427,8 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                         echo '<input type="hidden" name="tolak_tanggal" value="' . htmlspecialchars($row['tanggal_absen']) . '">';
                         echo '<button type="submit" class="btn-aksi cross" title="Tolak">'
                             . '<svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">'
-                            . '<line x1="6" y1="6" x2="16" y2="16" stroke="#d90429" stroke-width="3" stroke-linecap="round"/>'
-                            . '<line x1="16" y1="6" x2="6" y2="16" stroke="#d90429" stroke-width="3" stroke-linecap="round"/>'
+                            . '<line x1="6" y1="6" x2="16" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
+                            . '<line x1="16" y1="6" x2="6" y2="16" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>'
                             . '</svg>'
                             . '</button>';
                         echo '</form>';

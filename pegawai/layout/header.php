@@ -52,8 +52,108 @@ exit;
 
 $_SESSION["id_pengguna"] = $id_pengguna;
 
-?>
 
+// Definisikan array user ID yang diizinkan untuk setiap menu KONFIRMASI IZIN
+$allowed_ruang = array('21', '106', '138', '145', '157', '166', '198', '221', '226', '230', '253', '257', '279', '23', '24', '350');
+$allowed_teknik = array('24', '21', '9', '23');
+$allowed_hublang = array('24', '21', '8', '3', '23');
+$allowed_umum = array('24', '21', '7', '23');
+
+// Cek apakah pengguna diizinkan untuk melihat menu Konfirmasi Izin sama sekali
+$is_konfirmasi_allowed = in_array($id_pengguna, $allowed_ruang) ||
+                         in_array($id_pengguna, $allowed_teknik) ||
+                         in_array($id_pengguna, $allowed_hublang) ||
+                         in_array($id_pengguna, $allowed_umum);
+
+// --- LOGIC UNTUK MENGAMBIL HITUNGAN PENGAJUAN IZIN YANG TERTUNDA ---
+
+// Fungsi helper untuk menghasilkan indikator neon tanpa jumlah
+function generate_indicator($count) {
+    if ($count > 0) {
+        // Menggunakan kelas khusus untuk styling dot indicator
+        return '<span class="badge rounded-circle badge-indicator badge-pulse ms-1"></span>';
+    }
+    return '';
+}
+
+// 1. Hitungan untuk Konfirmasi Izin Sub-Bagian (Ruang)
+$count_ruang = 0;
+// PASTIKAN $connection ADA SEBELUM MENGGUNAKANNYA
+if (isset($connection)) {
+    $query_ruang = "SELECT COUNT(a.id_pegawai) AS total FROM absensi a 
+        JOIN pegawai p ON a.id_pegawai = p.id
+        WHERE a.status IS NULL 
+        AND p.jabatan = 'Staf'
+        AND p.bagian = (SELECT bagian FROM pegawai WHERE id = ?)";
+    $stmt_ruang = $connection->prepare($query_ruang);
+    $stmt_ruang->bind_param("i", $id_pengguna);
+    $stmt_ruang->execute();
+    $result_ruang = $stmt_ruang->get_result()->fetch_assoc();
+    $count_ruang = $result_ruang['total'];
+}
+
+
+// 2. Hitungan untuk Konfirmasi Izin Bagian Teknik
+$count_teknik = 0;
+if (isset($connection)) {
+    $query_teknik = "SELECT COUNT(a.id_pegawai) AS total FROM absensi a 
+        JOIN pegawai p ON a.id_pegawai = p.id
+        WHERE a.status IS NULL 
+        AND p.jabatan = 'Asisten Manajer'
+        AND p.bagian LIKE '1%'";
+    $stmt_teknik = $connection->prepare($query_teknik);
+    $stmt_teknik->execute();
+    $result_teknik = $stmt_teknik->get_result()->fetch_assoc();
+    $count_teknik = $result_teknik['total'];
+}
+
+// 3. Hitungan untuk Konfirmasi Izin Bagian HubLang
+$count_hublang = 0;
+if (isset($connection)) {
+    $query_hublang = "SELECT COUNT(a.id_pegawai) AS total FROM absensi a 
+        JOIN pegawai p ON a.id_pegawai = p.id
+        WHERE a.status IS NULL 
+        AND p.jabatan = 'Asisten Manajer'
+        AND p.bagian LIKE '2%'";
+    $stmt_hublang = $connection->prepare($query_hublang);
+    $stmt_hublang->execute();
+    $result_hublang = $stmt_hublang->get_result()->fetch_assoc();
+    $count_hublang = $result_hublang['total'];
+}
+
+// 4. Hitungan untuk Konfirmasi Izin Bagian Umum
+$count_umum = 0;
+if (isset($connection)) {
+    $query_umum = "SELECT COUNT(a.id_pegawai) AS total FROM absensi a 
+        JOIN pegawai p ON a.id_pegawai = p.id
+        WHERE a.status IS NULL 
+        AND p.jabatan = 'Asisten Manajer'
+        AND p.bagian LIKE '3%'";
+    $stmt_umum = $connection->prepare($query_umum);
+    $stmt_umum->execute();
+    $result_umum = $stmt_umum->get_result()->fetch_assoc();
+    $count_umum = $result_umum['total'];
+}
+
+// Hitung total pending requests yang terlihat/dapat diakses oleh user saat ini
+$total_pending_for_user = 0;
+
+if (in_array($id_pengguna, $allowed_ruang)) {
+    $total_pending_for_user += $count_ruang;
+}
+if (in_array($id_pengguna, $allowed_teknik)) {
+    $total_pending_for_user += $count_teknik;
+}
+if (in_array($id_pengguna, $allowed_hublang)) {
+    $total_pending_for_user += $count_hublang;
+}
+if (in_array($id_pengguna, $allowed_umum)) {
+    $total_pending_for_user += $count_umum;
+}
+
+// Variabel final untuk menentukan tampilan notifikasi
+$show_navbar_notification = ($total_pending_for_user > 0);
+?>
 
 
 <!doctype html>
@@ -74,11 +174,11 @@ $_SESSION["id_pengguna"] = $id_pengguna;
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<link href="/absensi/assets/css/tabler.min.css?1684106062" rel="stylesheet" />
+<link href="/assets/css/tabler.min.css?1684106062" rel="stylesheet" />
 
-<link href="/absensi/assets/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
+<link href="/assets/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
 
-<link href="/absensi/assets/css/demo.min.css?1684106062" rel="stylesheet" />
+<link href="/assets/css/demo.min.css?1684106062" rel="stylesheet" />
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 
@@ -121,6 +221,8 @@ console.log('Pendaftaran Service Worker gagal:', error);
 --primary-color: #00e0b3; /* Hijau neon */
 
 --secondary-color: #00a4d4; /* Biru elektrik */
+--indicator-color: #ff007f; /* PINK NEON */
+--indicator-glow: rgba(255, 0, 127, 0.8);
 
 --bg-color: #0a0a0d;
 
@@ -185,7 +287,8 @@ box-shadow: 0 0 15px rgba(0, 224, 179, 0.2);
 border-color: var(--primary-color);
 
 color: var(--primary-color);
-
+/* NEW: Set position relative for badge positioning */
+position: relative; 
 }
 
 .navbar .navbar-toggler:hover {
@@ -371,6 +474,56 @@ transform: translateY(-2px);
 
 }
 
+/* New CSS for clearer navigation groupings (dropdowns) */
+.nav-link.dropdown-toggle::after {
+    border-top-color: var(--text-color);
+}
+.nav-link:hover.dropdown-toggle::after {
+    border-top-color: var(--primary-color);
+}
+.dropdown-item .nav-link-icon svg {
+    margin-right: 0.5rem;
+}
+.dropdown-item {
+    padding: 0.5rem 1rem !important;
+}
+
+/* Tambahkan animasi pulse untuk notifikasi badge */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 127, 0.6); /* Menggunakan indicator-glow */
+    }
+    70% {
+        box-shadow: 0 0 0 8px rgba(255, 0, 127, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 127, 0);
+    }
+}
+.badge-pulse {
+    animation: pulse 1.5s infinite;
+}
+
+/* Styling untuk dot indicator */
+.badge-indicator {
+    height: 10px; /* Ukuran dot */
+    width: 10px; 
+    padding: 0 !important; 
+    border-radius: 50% !important;
+    background-color: var(--indicator-color) !important;
+    box-shadow: 0 0 5px var(--indicator-glow);
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Styling untuk notifikasi badge di navbar toggler */
+.navbar-toggler .badge {
+    position: absolute;
+    top: -3px; 
+    right: -3px; 
+    z-index: 10;
+}
+
 </style>
 
 </head>
@@ -390,14 +543,20 @@ transform: translateY(-2px);
 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
 
 <span class="navbar-toggler-icon"></span>
-
+<?php
+    // Tampilkan indikator hanya jika ada total pengajuan pending > 0 UNTUK USER INI
+    if ($show_navbar_notification) {
+        // Menggunakan gaya inline untuk posisi badge di dalam button yang relative, menggunakan kelas badge-indicator
+        echo '<span class="badge badge-indicator badge-pulse" style="position: absolute; top: 0px; right: 0px; z-index: 10;"></span>';
+    }
+?>
 </button>
 
 <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
 
 <a href="<?= ('../../pegawai/home/home.php') ?>">
 
-<img src="/absensi/assets/img/logo.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+<img src="/assets/img/logo.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
 
 </a>
 
@@ -425,11 +584,11 @@ transform: translateY(-2px);
 
 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
 
-<a href="/absensi/pegawai/home/profil.php" class="dropdown-item">Profil</a>
+<a href="/pegawai/home/profil.php" class="dropdown-item">Profil</a>
 
-<a href="/absensi/pegawai/home/edit_password.php" class="dropdown-item">Ubah Password</a>
+<a href="/pegawai/home/edit_password.php" class="dropdown-item">Ubah Password</a>
 
-<a href="/absensi/auth/logout.php" class="dropdown-item">Logout</a>
+<a href="/auth/logout.php" class="dropdown-item">Logout</a>
 
 </div>
 
@@ -483,7 +642,7 @@ Home
 
 <li class="nav-item">
 
-<a class="nav-link" href="/absensi/pegawai/home/pengajuan.php">
+<a class="nav-link" href="/pegawai/home/pengajuan.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
@@ -513,19 +672,10 @@ Pengajuan Izin
 
 </li>
 
-<li class="nav-item">
+<?php if ($is_konfirmasi_allowed) { /* START Konfirmasi Izin Main Menu Check */ ?>
+<li class="nav-item dropdown">
 
-<?php
-
-$allowed_ids = array('21', '106', '138', '145', '157', '166', '198', '221', '226', '230', '253', '257', '279', '23', '24', '349');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
-
-?>
-
-<a class="nav-link" href="/absensi/pegawai/home/konfirmasi_izin_ruang.php">
+<a class="nav-link dropdown-toggle <?= $total_pending_for_user > 0 ? 'text-primary' : '' ?>" href="#konfirmasi-izin-menu" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
@@ -545,9 +695,129 @@ if (in_array($id_pengguna, $allowed_ids)) {
 
 <span class="nav-link-title">
 
-Konfirmasi Izin Sub-Bagian
+Konfirmasi Izin <?= generate_indicator($total_pending_for_user) ?>
 
 </span>
+
+</a>
+
+<div class="dropdown-menu">
+
+<?php
+
+if (in_array($id_pengguna, $allowed_ruang)) {
+
+?>
+
+<a class="dropdown-item" href="/pegawai/home/konfirmasi_izin_ruang.php">
+
+<span class="nav-link-icon d-md-none d-lg-inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+
+<path d="M14 3v4a1 1 0 0 0 1 1h4" />
+
+<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+
+<path d="M9 15l2 2l4 -4" />
+
+</svg>
+
+</span>
+
+Konfirmasi Izin Sub-Bagian <?= generate_indicator($count_ruang) ?>
+
+</a>
+
+<?php
+
+}
+
+if (in_array($id_pengguna, $allowed_teknik)) {
+
+?>
+
+<a class="dropdown-item" href="/pegawai/home/konfirmasi_izin_teknik.php">
+
+<span class="nav-link-icon d-md-none d-lg-inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+
+<path d="M14 3v4a1 1 0 0 0 1 1h4" />
+
+<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+
+<path d="M9 15l2 2l4 -4" />
+
+</svg>
+
+</span>
+
+Konfirmasi Izin Bagian Teknik <?= generate_indicator($count_teknik) ?>
+
+</a>
+
+<?php
+
+}
+
+if (in_array($id_pengguna, $allowed_hublang)) {
+
+?>
+
+<a class="dropdown-item" href="/pegawai/home/konfirmasi_izin_hublang.php">
+
+<span class="nav-link-icon d-md-none d-lg-inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+
+<path d="M14 3v4a1 1 0 0 0 1 1h4" />
+
+<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+
+<path d="M9 15l2 2l4 -4" />
+
+</svg>
+
+</span>
+
+Konfirmasi Izin Bagian HubLang <?= generate_indicator($count_hublang) ?>
+
+</a>
+
+<?php
+
+}
+
+if (in_array($id_pengguna, $allowed_umum)) {
+
+?>
+
+<a class="dropdown-item" href="/pegawai/home/konfirmasi_izin_umum.php">
+
+<span class="nav-link-icon d-md-none d-lg-inline-block">
+
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-file-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+
+<path d="M14 3v4a1 1 0 0 0 1 1h4" />
+
+<path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+
+<path d="M9 15l2 2l4 -4" />
+
+</svg>
+
+</span>
+
+Konfirmasi Izin Bagian Umum <?= generate_indicator($count_umum) ?>
 
 </a>
 
@@ -557,25 +827,18 @@ Konfirmasi Izin Sub-Bagian
 
 ?>
 
+</div>
+
 </li>
+<?php } /* END Konfirmasi Izin Main Menu Check */ ?>
 
-<li class="nav-item">
+<li class="nav-item dropdown">
 
-<?php
-
-$allowed_ids = array('24', '21', '9', '349', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
-
-?>
-
-<a class="nav-link" href="/absensi/pegawai/home/konfirmasi_izin_teknik.php">
+<a class="nav-link dropdown-toggle" href="#rekap-presensi-menu" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 
 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
 
@@ -583,7 +846,9 @@ if (in_array($id_pengguna, $allowed_ids)) {
 
 <path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
 
-<path d="M9 14l2 2l4 -4" />
+<path d="M9 12l2 2l4 -4" />
+
+<path d="M9 16h6" />
 
 </svg>
 
@@ -591,33 +856,15 @@ if (in_array($id_pengguna, $allowed_ids)) {
 
 <span class="nav-link-title">
 
-Konfirmasi Izin Bagian Teknik
+Rekap & Presensi
 
 </span>
 
 </a>
 
-<?php
+<div class="dropdown-menu">
 
-}
-
-?>
-
-</li>
-
-<li class="nav-item">
-
-<?php
-
-$allowed_ids = array('24', '21', '8', '349', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
-
-?>
-
-<a class="nav-link" href="/absensi/pegawai/home/konfirmasi_izin_hublang.php">
+<a class="dropdown-item" href="/pegawai/home/rekap.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
@@ -634,134 +881,42 @@ if (in_array($id_pengguna, $allowed_ids)) {
 </svg>
 
 </span>
-
-<span class="nav-link-title">
-
-Konfirmasi Izin Bagian HubLang
-
-</span>
-
-</a>
-
-<?php
-
-}
-
-?>
-
-</li>
-
-<li class="nav-item">
-
-<?php
-
-$allowed_ids = array('24', '21', '7', '349', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
-
-?>
-
-<a class="nav-link" href="/absensi/pegawai/home/konfirmasi_izin_umum.php">
-
-<span class="nav-link-icon d-md-none d-lg-inline-block">
-
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-
-<path d="M9 14l2 2l4 -4" />
-
-</svg>
-
-</span>
-
-<span class="nav-link-title">
-
-Konfirmasi Izin Bagian Umum
-
-</span>
-
-</a>
-
-<?php
-
-}
-
-?>
-
-</li>
-
-<li class="nav-item">
-
-<a class="nav-link" href="/absensi/pegawai/home/rekap.php">
-
-<span class="nav-link-icon d-md-none d-lg-inline-block">
-
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
-
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
-
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-
-<path d="M9 14l2 2l4 -4" />
-
-</svg>
-
-</span>
-
-<span class="nav-link-title">
 
 Rekap Presensi
 
-</span>
-
 </a>
-
-</li>
-
-<li class="nav-item">
 
 <?php
 
-$allowed_ids = array('21', '106', '138', '145', '157', '166', '198', '221', '226', '230', '253', '257', '279', '24', '23');
+$allowed_ruang_presensi = array('21', '106', '138', '145', '157', '166', '198', '221', '226', '230', '253', '257', '279', '24', '23', '350');
 
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
+if (in_array($id_pengguna, $allowed_ruang_presensi)) {
 
 ?>
 
-<a class="nav-link" href="/absensi/pegawai/home/rekap_ruang.php">
+<a class="dropdown-item" href="/pegawai/home/rekap_ruang.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-users-group" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+<path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
 
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+<path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
 
-<path d="M9 14l2 2l4 -4" />
+<path d="M15 5h3.5a2 2 0 0 1 0 4h-3.5" />
+
+<path d="M15 11h3.5a2 2 0 0 0 0 4h-3.5" />
+
+<path d="M5 5a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v1h-8v-1" />
 
 </svg>
 
 </span>
 
-<span class="nav-link-title">
-
-Presensi sub-Bagian
-
-</span>
+Presensi Sub-Bagian
 
 </a>
 
@@ -769,183 +924,131 @@ Presensi sub-Bagian
 
 }
 
-?>
+$allowed_teknik_presensi = array('24', '21', '9', '23');
 
-</li>
-
-<li class="nav-item">
-
-<?php
-
-$allowed_ids = array('24', '21', '9', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
+if (in_array($id_pengguna, $allowed_teknik_presensi)) {
 
 ?>
 
-<a class="nav-link" href="/absensi/pegawai/home/rekap_teknik.php">
+<a class="dropdown-item" href="/pegawai/home/rekap_teknik.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+<path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .356 2.37 .5 2.572 1.065z" />
 
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
-
-<path d="M9 14l2 2l4 -4" />
+<path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
 
 </svg>
 
 </span>
-
-<span class="nav-link-title">
 
 Presensi Bagian Teknik
 
-</span>
-
 </a>
 
 <?php
 
 }
 
-?>
+$allowed_hublang_presensi = array('24', '21', '8', '23');
 
-</li>
-
-<li class="nav-item">
-
-<?php
-
-$allowed_ids = array('24', '21', '8', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
+if (in_array($id_pengguna, $allowed_hublang_presensi)) {
 
 ?>
 
-<a class="nav-link" href="/absensi/pegawai/home/rekap_hublang.php">
+<a class="dropdown-item" href="/pegawai/home/rekap_hublang.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-route" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+<path d="M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
 
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+<path d="M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4" />
 
-<path d="M9 14l2 2l4 -4" />
+<path d="M11 19h-1a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2h2" />
+
+<path d="M17 19h-1a2 2 0 0 1 -2 -2v-11a2 2 0 0 1 2 -2h2" />
 
 </svg>
 
 </span>
-
-<span class="nav-link-title">
 
 Presensi Bagian HubLang
 
-</span>
-
 </a>
 
 <?php
 
 }
 
-?>
+$allowed_umum_presensi = array('24', '21', '7', '23');
 
-</li>
-
-<li class="nav-item">
-
-<?php
-
-$allowed_ids = array('24', '21', '7', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
+if (in_array($id_pengguna, $allowed_umum_presensi)) {
 
 ?>
 
-<a class="nav-link" href="/absensi/pegawai/home/rekap_umum.php">
+<a class="dropdown-item" href="/pegawai/home/rekap_umum.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-building-warehouse" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+<path d="M3 21v-13l9 -4l9 4v13" />
 
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+<path d="M13 13h4v8h-10v-6h6" />
 
-<path d="M9 14l2 2l4 -4" />
+<path d="M13 17h4" />
 
 </svg>
 
 </span>
-
-<span class="nav-link-title">
 
 Presensi Bagian Umum
 
-</span>
-
 </a>
 
 <?php
 
 }
 
-?>
+$allowed_all_presensi = array('24', '21', '3', '23');
 
-</li>
-
-<li class="nav-item">
-
-<?php
-
-$allowed_ids = array('24', '21', '3', '23');
-
-
-
-if (in_array($id_pengguna, $allowed_ids)) {
+if (in_array($id_pengguna, $allowed_all_presensi)) {
 
 ?>
 
-<a class="nav-link" href="/absensi/pegawai/home/rekap_all.php">
+<a class="dropdown-item" href="/pegawai/home/rekap_all.php">
 
 <span class="nav-link-icon d-md-none d-lg-inline-block">
 
-<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+<svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-world" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
 
-<path stroke="none" d="M0 0h24v24H0z" fill="none" />
+<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
 
-<path d="M9 5h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2h-2" />
+<path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" />
 
-<path d="M9 3m0 2a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v0a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2z" />
+<path d="M3.6 9h16.8" />
 
-<path d="M9 14l2 2l4 -4" />
+<path d="M3.6 15h16.8" />
+
+<path d="M11.5 3a17 17 0 0 0 0 18" />
+
+<path d="M12.5 3a17 17 0 0 1 0 18" />
 
 </svg>
 
 </span>
 
-<span class="nav-link-title">
-
 Presensi Perusahaan
-
-</span>
 
 </a>
 
@@ -954,6 +1057,8 @@ Presensi Perusahaan
 }
 
 ?>
+
+</div>
 
 </li>
 

@@ -16,7 +16,7 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi ORDER BY nama
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-    <a href="/absensi/admin/data_lokasi_presensi/tambah.php" class="btn btn-primary"><span class="text"><i class="fa-solid fa-circle-plus"></i> Tambah Data</span></a>
+    <a href="/admin/data_lokasi_presensi/tambah.php" class="btn btn-primary"><span class="text"><i class="fa-solid fa-circle-plus"></i> Tambah Data</span></a>
 
         <table class="table table-bordered mt-3">
             <tr class="text-center">
@@ -42,13 +42,13 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi ORDER BY nama
                         <td><?= $lokasi['latitude'] .'/'. $lokasi['longitude'] ?></td>
                         <td><?= $lokasi['radius'] ?></td>
                         <td class="text-center">
-                            <a href="/absensi/admin/data_lokasi_presensi/detail.php?id=<?= $lokasi['id'] ?>"
+                            <a href="/admin/data_lokasi_presensi/detail.php?id=<?= $lokasi['id'] ?>"
                             class="badge badge-pill bg-primary">Detail</a>
 
-                            <a href="/absensi/admin/data_lokasi_presensi/edit.php?id=<?= $lokasi['id'] ?>"
+                            <a href="/admin/data_lokasi_presensi/edit.php?id=<?= $lokasi['id'] ?>"
                             class="badge badge-pill bg-primary">Edit</a>
 
-                            <a href="/absensi/admin/data_lokasi_presensi/hapus.php?id=<?= $lokasi['id'] ?>"
+                            <a href="/admin/data_lokasi_presensi/hapus.php?id=<?= $lokasi['id'] ?>"
                             class="badge badge-pill bg-danger tombol-hapus">Hapus</a>
                         </td>
                     </tr>

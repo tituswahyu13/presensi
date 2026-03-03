@@ -98,7 +98,7 @@ if ($jam = mysqli_fetch_array($result)) {
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-        <form action="/absensi/admin/jam_kerja/kantor.php" method="POST">
+        <form action="/admin/jam_kerja/kantor.php" method="POST">
             <div class="row">
                 <div class="card col-md-6">
                     <div class="card-body">

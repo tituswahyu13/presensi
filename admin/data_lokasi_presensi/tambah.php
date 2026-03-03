@@ -71,7 +71,7 @@ if (isset($_POST['submit'])) {
 
         <div class="card col md-6">
             <div class="card-body">
-                <form action="/absensi/admin/data_lokasi_presensi/tambah.php" method="POST">
+                <form action="/admin/data_lokasi_presensi/tambah.php" method="POST">
                     <div class="mb-3">
                         <label for="">Nama Lokasi</label>
                         <input type="text" class="form-control" name="nama_lokasi" value="<?php if (isset($_POST['nama_lokasi'])) echo $_POST['nama_lokasi'] ?>">

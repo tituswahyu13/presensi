@@ -3,10 +3,10 @@ session_start();
 include_once("../../config.php");
 
 if (!isset($_SESSION["login"])) {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
+  header("Location: ../../auth/login.php?pesan=belum_login");
   exit();
 } elseif (!in_array($_SESSION["role"], ["pegawai", "sumber", "tidar", "kalimas", "sri_ponganten", "satpam"])) {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
+  header("Location: ../../auth/login.php?pesan=tolak_akses");
   exit();
 }
 

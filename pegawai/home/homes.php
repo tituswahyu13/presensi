@@ -2,10 +2,10 @@
 session_start();
 // date_default_timezone_set('Asia/Jakarta');
 if (!isset($_SESSION["login"])) {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
+  header("Location: ../../auth/login.php?pesan=belum_login");
   exit();
 } elseif ($_SESSION["role"] != "pegawai") {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
+  header("Location: ../../auth/login.php?pesan=tolak_akses");
   exit();
 }
 
@@ -15,7 +15,6 @@ include('../layout/header.php');
 include_once("../../config.php");
 
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : '';
-echo $username;
 
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
 $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
@@ -371,7 +370,7 @@ if (isset($zona_waktu)) {
   <div class="container-xl">
     <div class="row row-deck g-4">
       <div class="col-lg-12 text-center">
-        <img src="/absensi/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
+        <img src="/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
       </div>
       <div class="col-md-6 col-lg-4">
         <div class="card text-center h-100">

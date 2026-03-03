@@ -447,7 +447,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
 
     <!-- Date Display -->
     <div class="date-display">
-        📅 
+        📅
         <?php if (empty($_GET['tanggal_dari'])) : ?>
             Rekap Event Tanggal: <?= date('d F Y') ?>
         <?php else : ?>
@@ -473,190 +473,196 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                         <tr>
                             <td colspan="5" class="text-center"> Belum ada data </td>
                         </tr>
-                    <?php } else {
-                    while ($rekap = $result->fetch_assoc()) :
-                        // Calculate total work hours
-                        $jam_tanggal_masuk = date('Y-m-d H:i:s', strtotime($rekap['tanggal_masuk'] . ' ' . $rekap['jam_masuk']));
-                        $jam_tanggal_keluar = date('Y-m-d H:i:s', strtotime($rekap['tanggal_keluar'] . ' ' . $rekap['jam_keluar']));
+                        <?php } else {
+                        while ($rekap = $result->fetch_assoc()) :
+                            // Calculate total work hours
+                            $jam_tanggal_masuk = date('Y-m-d H:i:s', strtotime($rekap['tanggal_masuk'] . ' ' . $rekap['jam_masuk']));
+                            $jam_tanggal_keluar = date('Y-m-d H:i:s', strtotime($rekap['tanggal_keluar'] . ' ' . $rekap['jam_keluar']));
 
-                        $timestamp_masuk = strtotime($jam_tanggal_masuk);
-                        $timestamp_keluar = strtotime($jam_tanggal_keluar);
+                            $timestamp_masuk = strtotime($jam_tanggal_masuk);
+                            $timestamp_keluar = strtotime($jam_tanggal_keluar);
 
-                        $selisih = $timestamp_keluar - $timestamp_masuk;
-                        $total_jam_kerja = floor($selisih / 3600);
-                        $selisih -= $total_jam_kerja * 3600;
-                        $selisih_menit_kerja = floor($selisih / 60);
+                            $selisih = $timestamp_keluar - $timestamp_masuk;
+                            $total_jam_kerja = floor($selisih / 3600);
+                            $selisih -= $total_jam_kerja * 3600;
+                            $selisih_menit_kerja = floor($selisih / 60);
 
-                        if ($rekap['role'] == 'pegawai') {
-                            // Calculate total late hours
-                            $jam_presensi = $rekap['lokasi_presensi'];
-                            $jam_query = "SELECT * FROM jam_kerja WHERE id = 1";
-                            $jam_stmt = $connection->prepare($jam_query);
-                            $jam_stmt->bind_param("s", $jam_presensi);
-                            $jam_stmt->execute();
-                            $jam_result = $jam_stmt->get_result()->fetch_assoc();
+                            if ($rekap['role'] == 'pegawai') {
+                                // Calculate total late hours
+                                $jam_presensi = $rekap['lokasi_presensi'];
+                                $jam_query = "SELECT * FROM jam_kerja WHERE id = 1";
+                                $jam_stmt = $connection->prepare($jam_query);
+                                $jam_stmt->bind_param("s", $jam_presensi);
+                                $jam_stmt->execute();
+                                $jam_result = $jam_stmt->get_result()->fetch_assoc();
 
-                            // Extract day of the week from tanggal_masuk
-                            $shift = date('N', strtotime($rekap['tanggal_masuk']));
+                                // Extract day of the week from tanggal_masuk
+                                $shift = date('N', strtotime($rekap['tanggal_masuk']));
 
-                            // $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk']));
+                                // $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk']));
 
-                            if ($shift == 1) {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_senin']));
-                            } elseif ($shift == 2) {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_selasa']));
-                            } elseif ($shift == 3) {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_rabu']));
-                            } elseif ($shift == 4) {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_kamis']));
-                            } elseif ($shift == 5) {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_jumat']));
+                                if ($shift == 1) {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_senin']));
+                                } elseif ($shift == 2) {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_selasa']));
+                                } elseif ($shift == 3) {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_rabu']));
+                                } elseif ($shift == 4) {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_kamis']));
+                                } elseif ($shift == 5) {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_jumat']));
+                                } else {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_sabtu']));
+                                }
+
+                                $jam_masuk = date('H:i:s', strtotime($rekap['jam_masuk']));
+                                $timestamp_jam_masuk_real = strtotime($jam_masuk);
+                                $timestamp_jam_masuk_kantor = strtotime($jam_masuk_kantor);
+
+                                $terlambat = $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
+                                $total_jam_terlambat = floor($terlambat / 3600);
+                                $terlambat -= $total_jam_terlambat * 3600;
+                                $selisih_menit_terlambat = floor($terlambat / 60);
+                                // Accumulate the lateness to the total
+                                $total_terlambat += $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
+
+                                // Extract day of the week from tanggal_keluar
+                                $current_day_pulang = date('N', strtotime($rekap['tanggal_keluar']));
+
+                                // Set the office end time
+                                if ($current_day_pulang == 1) {
+                                    $jam_pulang_kantor = strtotime($jam_result['jam_pulang_senin']);
+                                } elseif ($current_day_pulang == 2) {
+                                    $jam_pulang_kantor = strtotime($jam_result['jam_pulang_selasa']);
+                                } elseif ($current_day_pulang == 3) {
+                                    $jam_pulang_kantor = strtotime($jam_result['jam_pulang_rabu']);
+                                } elseif ($current_day_pulang == 4) {
+                                    $jam_pulang_kantor = strtotime($jam_result['jam_pulang_kamis']);
+                                } elseif ($current_day_pulang == 5) {
+                                    $jam_pulang_kantor = strtotime($jam_result['jam_pulang_jumat']);
+                                } else {
+                                    $jam_pulang_kantor = strtotime($jam_result['jam_pulang_sabtu']);
+                                }
+
+                                // Calculate early departure
+                                $jam_pulang = date('H:i:s', strtotime($rekap['jam_keluar']));
+                                $timestamp_jam_pulang_real = strtotime($jam_pulang);
+                                $timestamp_jam_pulang_kantor = ($jam_pulang_kantor);
+
+
+                                // Adjust for overnight shifts
+                                if (strtotime($rekap['tanggal_keluar']) > strtotime($rekap['tanggal_masuk'])) {
+                                    $timestamp_jam_pulang_real += 24 * 3600; // Add 24 hours
+                                }
+
+                                $awal = $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real;
+                                $total_jam_awal = floor(($timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real) / 3600);
+                                $awal -= $total_jam_awal * 3600;
+                                $selisih_menit_awal = floor($awal / 60);
+                                // Accumulate the early to the total
+                                // Accumulate the early time to the total only if $timestamp_jam_pulang_real is positive
+                                if (!empty($rekap['tanggal_keluar']) && $timestamp_jam_pulang_real > 0) {
+                                    $total_awal += max(0, $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real);
+                                }
+                            } elseif ($rekap['role'] == 'sumber' || $rekap['role'] == 'tidar') {
+                                // Calculate total late hours
+                                $jam_presensi = $rekap['lokasi_presensi'];
+                                $shift = $rekap['shift'];
+                                $jam_query = "SELECT * FROM shift WHERE id = 1";
+                                $jam_stmt = $connection->prepare($jam_query);
+                                $jam_stmt->bind_param("s", $jam_presensi);
+                                $jam_stmt->execute();
+                                $jam_result = $jam_stmt->get_result()->fetch_assoc();
+
+                                if ($shift == 'A') {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_a']));
+                                } elseif ($shift == 'B') {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_b']));
+                                } elseif ($shift == 'C') {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_c']));
+                                } elseif ($shift == 'D') {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_d']));
+                                } else {
+                                    $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_e']));
+                                }
+
+                                $jam_masuk = date('H:i:s', strtotime($rekap['jam_masuk']));
+                                $timestamp_jam_masuk_real = strtotime($jam_masuk);
+                                $timestamp_jam_masuk_kantor = strtotime($jam_masuk_kantor);
+
+                                $terlambat = $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
+                                $total_jam_terlambat = floor($terlambat / 3600);
+                                $terlambat -= $total_jam_terlambat * 3600;
+                                $selisih_menit_terlambat = floor($terlambat / 60);
+                                // Accumulate the lateness to the total
+                                $total_terlambat += $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
+
+                                // Set the office end time
+                                if ($shift == 'A') {
+                                    $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_a']));
+                                } elseif ($shift == 'B') {
+                                    $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_b']));
+                                } elseif ($shift == 'C') {
+                                    $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_c']));
+                                } elseif ($shift == 'D') {
+                                    $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_d']));
+                                } else {
+                                    $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_e']));
+                                }
+
+                                // Calculate early departure
+                                $jam_pulang = date('H:i:s', strtotime($rekap['jam_keluar']));
+                                $timestamp_jam_pulang_real = strtotime($jam_pulang);
+                                $timestamp_jam_pulang_kantor = strtotime($jam_pulang_kantor);
+
+                                // Adjust for overnight shifts
+                                if (strtotime($rekap['tanggal_keluar']) > strtotime($rekap['tanggal_masuk'])) {
+                                    $timestamp_jam_pulang_real += 24 * 3600; // Add 24 hours
+                                }
+
+                                $awal = $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real;
+                                $total_jam_awal = floor(($timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real) / 3600);
+                                $awal -= $total_jam_awal * 3600;
+                                $selisih_menit_awal = floor($awal / 60);
+                                // Accumulate the early to the total
+                                // Accumulate the early time to the total only if $timestamp_jam_pulang_real is positive
+                                if (!empty($rekap['tanggal_keluar']) && $timestamp_jam_pulang_real > 0) {
+                                    $total_awal += max(0, $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real);
+                                }
+                            }
+
+                            // Determine the photo paths
+                            $foto_nama_masuk = htmlspecialchars($rekap['foto']);
+                            $foto_masuk_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            $foto_masuk_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_masuk;
+
+                            if (file_exists($foto_masuk_path_pegawai)) {
+                                $foto_masuk = "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            } elseif (file_exists($foto_masuk_path_shift)) {
+                                $foto_masuk = "/shift/presensi/foto/" . $foto_nama_masuk;
                             } else {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['jam_masuk_sabtu']));
+                                $foto_masuk = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_masuk;
                             }
 
-                            $jam_masuk = date('H:i:s', strtotime($rekap['jam_masuk']));
-                            $timestamp_jam_masuk_real = strtotime($jam_masuk);
-                            $timestamp_jam_masuk_kantor = strtotime($jam_masuk_kantor);
-
-                            $terlambat = $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
-                            $total_jam_terlambat = floor($terlambat / 3600);
-                            $terlambat -= $total_jam_terlambat * 3600;
-                            $selisih_menit_terlambat = floor($terlambat / 60);
-                            // Accumulate the lateness to the total
-                            $total_terlambat += $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
-
-                            // Extract day of the week from tanggal_keluar
-                            $current_day_pulang = date('N', strtotime($rekap['tanggal_keluar']));
-
-                            // Set the office end time
-                            if ($current_day_pulang == 1) {
-                                $jam_pulang_kantor = strtotime($jam_result['jam_pulang_senin']);
-                            } elseif ($current_day_pulang == 2) {
-                                $jam_pulang_kantor = strtotime($jam_result['jam_pulang_selasa']);
-                            } elseif ($current_day_pulang == 3) {
-                                $jam_pulang_kantor = strtotime($jam_result['jam_pulang_rabu']);
-                            } elseif ($current_day_pulang == 4) {
-                                $jam_pulang_kantor = strtotime($jam_result['jam_pulang_kamis']);
-                            } elseif ($current_day_pulang == 5) {
-                                $jam_pulang_kantor = strtotime($jam_result['jam_pulang_jumat']);
-                            } else {
-                                $jam_pulang_kantor = strtotime($jam_result['jam_pulang_sabtu']);
-                            }
-
-                            // Calculate early departure
-                            $jam_pulang = date('H:i:s', strtotime($rekap['jam_keluar']));
-                            $timestamp_jam_pulang_real = strtotime($jam_pulang);
-                            $timestamp_jam_pulang_kantor = ($jam_pulang_kantor);
-
-
-                            // Adjust for overnight shifts
-                            if (strtotime($rekap['tanggal_keluar']) > strtotime($rekap['tanggal_masuk'])) {
-                                $timestamp_jam_pulang_real += 24 * 3600; // Add 24 hours
-                            }
-
-                            $awal = $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real;
-                            $total_jam_awal = floor(($timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real) / 3600);
-                            $awal -= $total_jam_awal * 3600;
-                            $selisih_menit_awal = floor($awal / 60);
-                            // Accumulate the early to the total
-                            // Accumulate the early time to the total only if $timestamp_jam_pulang_real is positive
-                            if (!empty($rekap['tanggal_keluar']) && $timestamp_jam_pulang_real > 0) {
-                                $total_awal += max(0, $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real);
-                            }
-                        } elseif ($rekap['role'] == 'sumber' || $rekap['role'] == 'tidar') {
-                            // Calculate total late hours
-                            $jam_presensi = $rekap['lokasi_presensi'];
-                            $shift = $rekap['shift'];
-                            $jam_query = "SELECT * FROM shift WHERE id = 1";
-                            $jam_stmt = $connection->prepare($jam_query);
-                            $jam_stmt->bind_param("s", $jam_presensi);
-                            $jam_stmt->execute();
-                            $jam_result = $jam_stmt->get_result()->fetch_assoc();
-
-                            if ($shift == 'A') {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_a']));
-                            } elseif ($shift == 'B') {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_b']));
-                            } elseif ($shift == 'C') {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_c']));
-                            } elseif ($shift == 'D') {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_d']));
-                            } else {
-                                $jam_masuk_kantor = date('H:i:s', strtotime($jam_result['masuk_e']));
-                            }
-
-                            $jam_masuk = date('H:i:s', strtotime($rekap['jam_masuk']));
-                            $timestamp_jam_masuk_real = strtotime($jam_masuk);
-                            $timestamp_jam_masuk_kantor = strtotime($jam_masuk_kantor);
-
-                            $terlambat = $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
-                            $total_jam_terlambat = floor($terlambat / 3600);
-                            $terlambat -= $total_jam_terlambat * 3600;
-                            $selisih_menit_terlambat = floor($terlambat / 60);
-                            // Accumulate the lateness to the total
-                            $total_terlambat += $timestamp_jam_masuk_real - $timestamp_jam_masuk_kantor;
-
-                            // Set the office end time
-                            if ($shift == 'A') {
-                                $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_a']));
-                            } elseif ($shift == 'B') {
-                                $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_b']));
-                            } elseif ($shift == 'C') {
-                                $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_c']));
-                            } elseif ($shift == 'D') {
-                                $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_d']));
-                            } else {
-                                $jam_pulang_kantor = date('H:i:s', strtotime($jam_result['pulang_e']));
-                            }
-
-                            // Calculate early departure
-                            $jam_pulang = date('H:i:s', strtotime($rekap['jam_keluar']));
-                            $timestamp_jam_pulang_real = strtotime($jam_pulang);
-                            $timestamp_jam_pulang_kantor = strtotime($jam_pulang_kantor);
-
-                            // Adjust for overnight shifts
-                            if (strtotime($rekap['tanggal_keluar']) > strtotime($rekap['tanggal_masuk'])) {
-                                $timestamp_jam_pulang_real += 24 * 3600; // Add 24 hours
-                            }
-
-                            $awal = $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real;
-                            $total_jam_awal = floor(($timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real) / 3600);
-                            $awal -= $total_jam_awal * 3600;
-                            $selisih_menit_awal = floor($awal / 60);
-                            // Accumulate the early to the total
-                            // Accumulate the early time to the total only if $timestamp_jam_pulang_real is positive
-                            if (!empty($rekap['tanggal_keluar']) && $timestamp_jam_pulang_real > 0) {
-                                $total_awal += max(0, $timestamp_jam_pulang_kantor - $timestamp_jam_pulang_real);
-                            }
-                        }
-
-                        // Determine the photo paths
-                        $foto_masuk = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto']);
-                        $foto_masuk_path = "/var/www/html/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto']);
-                        if (!file_exists($foto_masuk_path)) {
-                            $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto']);
-                        }
-
-                    ?>
-                        <tr style="background-color: #f0f8ff;">
-                            <td style="background-color: #f0f8ff;"><?= htmlspecialchars($rekap['nama']) ?></td>
-                            <td style="background-color: #e6ffe6;" class="text-center"><?= !empty($rekap['tanggal']) ? date('d F Y', strtotime($rekap['tanggal'])) : '<span style="color: red;">Belum ada event</span>' ?></td>
-                            <td style="background-color: #e6ffe6;" class="text-center"><?= htmlspecialchars($rekap['jam']) ?></td>
-                            <td class="foto-column">
-                                <img class="img-fluid" src="<?= $foto_masuk ?>">
-                            </td>
-                            <td class="text-center">
-                                <a href="/absensi/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
-                                <a href="/absensi/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
-                <?php } ?>
-            </tbody>
-        </table>
+                        ?>
+                            <tr style="background-color: #f0f8ff;">
+                                <td style="background-color: #f0f8ff;"><?= htmlspecialchars($rekap['nama']) ?></td>
+                                <td style="background-color: #e6ffe6;" class="text-center"><?= !empty($rekap['tanggal']) ? date('d F Y', strtotime($rekap['tanggal'])) : '<span style="color: red;">Belum ada event</span>' ?></td>
+                                <td style="background-color: #e6ffe6;" class="text-center"><?= htmlspecialchars($rekap['jam']) ?></td>
+                                <td class="foto-column">
+                                    <img class="img-fluid" src="<?= $foto_masuk ?>">
+                                </td>
+                                <td class="text-center">
+                                    <a href="/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
+                                    <a href="/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 </div>
 
 <!-- Export Modal -->

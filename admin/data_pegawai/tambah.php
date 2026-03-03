@@ -179,7 +179,7 @@ if (isset($_POST['submit'])) {
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-        <form action="/absensi/admin/data_pegawai/tambah.php" method="POST" enctype="multipart/form-data">
+        <form action="/admin/data_pegawai/tambah.php" method="POST" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">

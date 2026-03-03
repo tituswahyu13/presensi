@@ -100,7 +100,7 @@ $result = fetchEmployees($connection, $searchTerm);
                         </form>
                     </div>
                     <div class="col-md-6 text-end">
-                        <a href="/absensi/admin/data_pegawai/tambah.php" class="btn btn-primary">
+                        <a href="/admin/data_pegawai/tambah.php" class="btn btn-primary">
                             <i class="fa-solid fa-circle-plus"></i> Tambah Data Pegawai
                         </a>
                     </div>
@@ -128,13 +128,13 @@ $result = fetchEmployees($connection, $searchTerm);
                                         <td class="text-center fw-medium"><?= htmlspecialchars($pegawai['nik']) ?></td>
                                         <td><?= htmlspecialchars($pegawai['nama']) ?></td>
                                         <td class="text-center">
-                                            <a href="/absensi/admin/data_pegawai/detail.php?id=<?= htmlspecialchars($pegawai['id']) ?>" class="btn btn-sm btn-info">
+                                            <a href="/admin/data_pegawai/detail.php?id=<?= htmlspecialchars($pegawai['id']) ?>" class="btn btn-sm btn-info">
                                                 <i class="fa-solid fa-eye"></i> Detail
                                             </a>
-                                            <a href="/absensi/admin/data_pegawai/edit.php?id=<?= htmlspecialchars($pegawai['id']) ?>" class="btn btn-sm btn-warning">
+                                            <a href="/admin/data_pegawai/edit.php?id=<?= htmlspecialchars($pegawai['id']) ?>" class="btn btn-sm btn-warning">
                                                 <i class="fa-solid fa-pen-to-square"></i> Edit
                                             </a>
-                                            <a href="/absensi/admin/data_pegawai/hapus.php?id=<?= htmlspecialchars($pegawai['id']) ?>" class="btn btn-sm btn-danger tombol-hapus">
+                                            <a href="/admin/data_pegawai/hapus.php?id=<?= htmlspecialchars($pegawai['id']) ?>" class="btn btn-sm btn-danger tombol-hapus">
                                                 <i class="fa-solid fa-trash"></i> Hapus
                                             </a>
                                         </td>

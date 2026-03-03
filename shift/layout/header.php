@@ -45,9 +45,9 @@ $_SESSION["id_pengguna"] = $id_pengguna;
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title><?= $judul ?></title>
   <!-- CSS files -->
-  <link href="/absensi/assets/css/tabler.min.css?1684106062" rel="stylesheet" />
-  <link href="/absensi/assets/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
-  <link href="/absensi/assets/css/demo.min.css?1684106062" rel="stylesheet" />
+  <link href="/assets/css/tabler.min.css?1684106062" rel="stylesheet" />
+  <link href="/assets/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
+  <link href="/assets/css/demo.min.css?1684106062" rel="stylesheet" />
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <!-- font awesome -->
@@ -106,7 +106,7 @@ $_SESSION["id_pengguna"] = $id_pengguna;
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
           <a href="<?= ('../../shift/home/home.php') ?>">
-            <img src="/absensi/assets/img/logo.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+            <img src="/assets/img/logo.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
           </a>
         </h1>
         <div class="navbar-nav flex-row order-md-last">
@@ -128,8 +128,8 @@ $_SESSION["id_pengguna"] = $id_pengguna;
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
               <!-- <a href="#" class="dropdown-item">Profile</a> -->
-              <a href="/absensi/shift/home/edit_password.php" class="dropdown-item">Ubah Password</a>
-              <a href="/absensi/auth/logout.php" class="dropdown-item">Logout</a>
+              <a href="/shift/home/edit_password.php" class="dropdown-item">Ubah Password</a>
+              <a href="/auth/logout.php" class="dropdown-item">Logout</a>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@ $_SESSION["id_pengguna"] = $id_pengguna;
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/absensi/shift/home/rekap.php">
+                <a class="nav-link" href="/shift/home/rekap.php">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clipboard-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -175,7 +175,7 @@ $_SESSION["id_pengguna"] = $id_pengguna;
                       <a class="dropdown-item" href="./accordion.html">
                         Rekap Harian
                       </a>
-                      <a class="dropdown-item" href="/absensi/pegawai/home/rekap.php">
+                      <a class="dropdown-item" href="/pegawai/home/rekap.php">
                         Rekap Bulanan
                       </a>
                     </div>
@@ -198,7 +198,7 @@ $_SESSION["id_pengguna"] = $id_pengguna;
                 </a>
               </li> -->
               <!-- <li class="nav-item">
-                <a class="nav-link" href="/absensi/auth/logout.php">
+                <a class="nav-link" href="/auth/logout.php">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-logout" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />

@@ -158,17 +158,17 @@
   </div>
 </div>
 <!-- Libs JS -->
-<script src="/absensi/assets/libs/apexcharts/dist/apexcharts.min.js?1684106062" defer></script>
-<script src="/absensi/assets/libs/jsvectormap/dist/js/jsvectormap.min.js?1684106062" defer></script>
-<script src="/absensi/assets/libs/jsvectormap/dist/maps/world.js?1684106062" defer></script>
-<script src="/absensi/assets/libs/jsvectormap/dist/maps/world-merc.js?1684106062" defer></script>
+<script src="/assets/libs/apexcharts/dist/apexcharts.min.js?1684106062" defer></script>
+<script src="/assets/libs/jsvectormap/dist/js/jsvectormap.min.js?1684106062" defer></script>
+<script src="/assets/libs/jsvectormap/dist/maps/world.js?1684106062" defer></script>
+<script src="/assets/libs/jsvectormap/dist/maps/world-merc.js?1684106062" defer></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 <!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script> -->
 <!-- <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script> -->
 
 <!-- Tabler Core -->
-<script src="/absensi/assets/js/tabler.min.js?1684106062" defer></script>
-<script src="/absensi/assets/js/demo.min.js?1684106062" defer></script>
+<script src="/assets/js/tabler.min.js?1684106062" defer></script>
+<script src="/assets/js/demo.min.js?1684106062" defer></script>
 
 <!-- Sweetalert -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

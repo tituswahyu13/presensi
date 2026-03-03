@@ -13,7 +13,7 @@ function logout() {
 if(isset($_POST["logout"])) {
     logout();
     // Redirect pengguna ke halaman login setelah logout
-    header("Location: /absensi/auth/login.php");
+    header("Location: /auth/login.php");
     exit();
 }
 
@@ -219,15 +219,15 @@ header("Expires: 0");
         </form>
     </div>
 
-    <audio id="logout-sound" src="/absensi/assets/audio/logout-sound.mp3" preload="auto"></audio>
-    <audio id="haptic-sound" src="/absensi/assets/audio/haptic-feedback.mp3" preload="auto"></audio>
+    <audio id="logout-sound" src="/assets/audio/logout-sound.mp3" preload="auto"></audio>
+    <audio id="haptic-sound" src="/assets/audio/haptic-feedback.mp3" preload="auto"></audio>
 
     <script>
         window.onload = function() {
             if (window.history && window.history.pushState) {
                 window.history.pushState('forward', null, '');
                 window.onpopstate = function() {
-                    window.location.href = "/absensi/auth/login.php";
+                    window.location.href = "/auth/login.php";
                 };
             }
         }

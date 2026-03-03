@@ -38,7 +38,7 @@ if(isset($_POST["submit"])){
           <div class="container-xl">
             <div class="card col-md-6">
                 <div class="card-body">
-                    <form action="/absensi/admin/data_jabatan/tambah.php"method="POST">
+                    <form action="/admin/data_jabatan/tambah.php"method="POST">
                         <div class="mb-3">
                             <label for="">Nama Jabatan</label>
                             <input type="text" class="form-control" name="jabatan">

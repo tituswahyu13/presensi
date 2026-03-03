@@ -410,7 +410,7 @@ $server_time = date('Y-m-d H:i:s');
         <div class="col-lg">
           <div class="container-tight">
             <div class="text-center mb-4">
-              <a href="" class="navbar-brand navbar-brand-autodark"><img src="/absensi/assets/img/logo.png" height="100" alt=""></a>
+              <a href="" class="navbar-brand navbar-brand-autodark"><img src="/assets/img/logo.png" height="100" alt=""></a>
             </div>
             <div class="card card-md">
               <div class="card-body">

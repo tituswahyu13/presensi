@@ -718,13 +718,13 @@ $result = $stmt->get_result();
                         </tr>
                         <?php } else {
                         foreach ($filtered_data as $rekap) {
-                            $foto_masuk = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
+                            $foto_masuk = "/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
                             if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $foto_masuk)) {
-                                $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
+                                $foto_masuk = "/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
                             }
-                            $foto_keluar = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
+                            $foto_keluar = "/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
                             if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $foto_keluar)) {
-                                $foto_keluar = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
+                                $foto_keluar = "/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
                             }
                         ?>
                             <tr style="<?= $rekap['lokasi_presensi'] == 'Kantor PDAM' ? 'background-color: #add8e6;' : 'background-color: #d1e7dd;'; ?>">
@@ -773,8 +773,8 @@ $result = $stmt->get_result();
                                 <td><?= ($rekap['keterangan']) ?></td>
                                 <td><?= ($rekap['jam_absen']) ?></td>
                                 <td class="text-center">
-                                    <a href="/absensi/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
-                                    <a href="/absensi/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
+                                    <a href="/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
+                                    <a href="/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
                                     
                                     <?php if (!empty($rekap['id'])): ?>
                                     <a href="javascript:void(0)" onclick="confirmDelete(
@@ -806,7 +806,7 @@ ob_end_flush();
     function confirmDelete(id, tanggal_dari, tanggal_sampai, nama, status) {
         if (confirm("Apakah Anda yakin ingin MENGHAPUS PERMANEN data presensi ini? Data akan dipindahkan ke arsip.")) {
             // Bangun URL untuk memanggil delete_presensi.php
-            const deleteUrl = `/absensi/admin/presensi/delete_presensi.php?id=${id}&tanggal_dari=${tanggal_dari}&tanggal_sampai=${tanggal_sampai}&nama=${nama}&status=${status}`;
+            const deleteUrl = `/admin/presensi/delete_presensi.php?id=${id}&tanggal_dari=${tanggal_dari}&tanggal_sampai=${tanggal_sampai}&nama=${nama}&status=${status}`;
             window.location.href = deleteUrl;
         }
     }

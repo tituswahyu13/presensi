@@ -1,10 +1,10 @@
 <?php
 session_start();
 if (!isset($_SESSION["login"])) {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
+  header("Location: ../../auth/login.php?pesan=belum_login");
   exit();
 } elseif ($_SESSION["role"] != "pegawai") {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
+  header("Location: ../../auth/login.php?pesan=tolak_akses");
   exit();
 }
 
@@ -12,7 +12,6 @@ include('../layout/header.php');
 include_once("../../config.php");
 
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : '';
-echo $username;
 
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
 $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
@@ -48,7 +47,7 @@ if ($lokasi_presensi == "Kantor PDAM") {
     <div class="container-xl">
       <div class="col">
         <div class="col-md-2"></div>
-        <img src="/absensi/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" width="100" height="175">
+        <img src="/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" width="100" height="175">
         <div class="col-md-4">
           <div class="card text-center h-50">
             <div class="card-header">Presensi Masuk</div>

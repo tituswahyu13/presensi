@@ -76,7 +76,7 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE id=$id"
         var latitude = <?= $lokasi['latitude'] ?>;
         var longitude = <?= $lokasi['longitude'] ?>;
 
-        var map = L.map('map').setView([latitude, longitude], 13);
+        var map = L.map('map').setView([latitude, longitude], 16);
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -86,12 +86,23 @@ $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE id=$id"
             .bindPopup('<?= $lokasi['nama_lokasi'] ?>')
             .openPopup();
 
+        // Konversi radius ke meter jika perlu dan validasi
+        var radiusValue = <?= $lokasi['radius'] ?>;
+        var radiusInMeters = radiusValue; // Asumsikan radius sudah dalam meter
+        
+        // Validasi radius minimum 10 meter dan maksimum 1000 meter
+        if (radiusInMeters < 10) radiusInMeters = 10;
+        if (radiusInMeters > 1000) radiusInMeters = 1000;
+
         L.circle([latitude, longitude], {
             color: 'red',
             fillColor: '#f03',
-            fillOpacity: 0.5,
-            radius: <?= $lokasi['radius'] ?>
+            fillOpacity: 0.3,
+            radius: radiusInMeters
         }).addTo(map);
+
+        // Tambahkan kontrol scale untuk referensi jarak
+        L.control.scale().addTo(map);
     </script>
 
 <?php endwhile; ?>

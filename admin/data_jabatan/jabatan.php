@@ -15,7 +15,7 @@ $result = mysqli_query($connection, "SELECT * FROM jabatan ORDER BY jabatan ASC"
         <!-- Page body -->
         <div class="page-body">
           <div class="container-xl">
-          <a href="/absensi/admin/data_jabatan/tambah.php" class="btn btn-primary"><span class="text"><i class="fa-solid fa-circle-plus"></i> Tambah Data</span></a>
+          <a href="/admin/data_jabatan/tambah.php" class="btn btn-primary"><span class="text"><i class="fa-solid fa-circle-plus"></i> Tambah Data</span></a>
             <div class="row row-deck row-cards mt-2">
               <table class="table table-bordered">
                 <tr class="text-center">
@@ -36,8 +36,8 @@ $result = mysqli_query($connection, "SELECT * FROM jabatan ORDER BY jabatan ASC"
                         <td><?= $no++ ?></td>
                         <td><?= $jabatan['jabatan'] ?></td>
                         <td class="text-center">
-                            <a href="/absensi/admin/data_jabatan/edit.php?id=<?= $jabatan['id'] ?>" class="badge bg-primary badge-pill">Edit</a>
-                            <a href="/absensi/admin/data_jabatan/hapus.php?id=<?= $jabatan['id'] ?>" class="badge bg-danger badge-pill tombol-hapus">Hapus</a>
+                            <a href="/admin/data_jabatan/edit.php?id=<?= $jabatan['id'] ?>" class="badge bg-primary badge-pill">Edit</a>
+                            <a href="/admin/data_jabatan/hapus.php?id=<?= $jabatan['id'] ?>" class="badge bg-danger badge-pill tombol-hapus">Hapus</a>
                         </td>
                     </tr>
                     <?php endwhile; ?>

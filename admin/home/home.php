@@ -1,10 +1,10 @@
 <?php
 session_start();
 if (!isset($_SESSION["login"])) {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
+  header("Location: ../../auth/login.php?pesan=belum_login");
   exit();
 } elseif ($_SESSION["role"] != "admin") {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
+  header("Location: ../../auth/login.php?pesan=tolak_akses");
   exit();
 }
 
@@ -12,7 +12,7 @@ $judul = "Home";
 include('../layout/header.php');
 
 // Connect to the database
-include('../../config/database.php'); // Assuming you have a separate file for DB connection
+require_once('../../config.php');
 
 $pegawai_query = "SELECT pegawai.*, users.status 
                   FROM pegawai 

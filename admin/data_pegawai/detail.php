@@ -37,7 +37,7 @@ function getTextAfterDot($text) {
                                         <div class="card-body text-center p-4">
                                             <div class="position-relative d-inline-block">
                                                 <img style="width: 100%; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" 
-                                                     src="/absensi/assets/img/foto_pegawai/<?= $pegawai['foto'] ?>" 
+                                                     src="/assets/img/foto_pegawai/<?= $pegawai['foto'] ?>" 
                                                      alt="Employee Photo">
                                                 <div class="position-absolute bottom-0 start-50 translate-middle-x mb-3">
                                                     <span class="badge bg-primary"><?= $pegawai['status'] ?></span>

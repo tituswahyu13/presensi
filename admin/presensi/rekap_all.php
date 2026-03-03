@@ -1202,7 +1202,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-center">
-                                    <a href="/absensi/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
+                                    <a href="/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

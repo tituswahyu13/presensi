@@ -75,7 +75,7 @@ if ($lokasi = mysqli_fetch_array($result)) {
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-        <form action="/absensi/admin/data_lokasi_presensi/edit.php" method="POST">
+        <form action="/admin/data_lokasi_presensi/edit.php" method="POST">
             <div class="row">
                 <div class="card col-md-6">
                     <div class="card-body">

@@ -448,7 +448,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
 
     <!-- Date Display -->
     <div class="date-display">
-        📅 
+        📅
         <?php if (empty($_GET['tanggal_dari'])) : ?>
             Rekap Izin Tanggal: <?= date('d F Y') ?>
         <?php else : ?>
@@ -482,7 +482,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                         <tr>
                             <td colspan="13" class="text-center"> Belum ada data </td>
                         </tr>
-                    <?php } else {
+                        <?php } else {
                         while ($rekap = $result->fetch_assoc()) :
                             // Calculate total work hours
                             $jam_tanggal_masuk = date('Y-m-d H:i:s', strtotime($rekap['tanggal_masuk'] . ' ' . $rekap['jam_masuk']));
@@ -567,16 +567,28 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                             }
 
                             // Determine the photo paths
-                            $foto_masuk = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                            $foto_masuk_path = "/var/www/html/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                            if (!file_exists($foto_masuk_path)) {
-                                $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
+                            $foto_nama_masuk = htmlspecialchars($rekap['foto_masuk']);
+                            $foto_masuk_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            $foto_masuk_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_masuk;
+
+                            if (file_exists($foto_masuk_path_pegawai)) {
+                                $foto_masuk = "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            } elseif (file_exists($foto_masuk_path_shift)) {
+                                $foto_masuk = "/shift/presensi/foto/" . $foto_nama_masuk;
+                            } else {
+                                $foto_masuk = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_masuk;
                             }
 
-                            $foto_keluar = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                            $foto_keluar_path = "/var/www/html/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                            if (!file_exists($foto_keluar_path)) {
-                                $foto_keluar = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
+                            $foto_nama_keluar = htmlspecialchars($rekap['foto_keluar']);
+                            $foto_keluar_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                            $foto_keluar_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_keluar;
+
+                            if (file_exists($foto_keluar_path_pegawai)) {
+                                $foto_keluar = "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                            } elseif (file_exists($foto_keluar_path_shift)) {
+                                $foto_keluar = "/shift/presensi/foto/" . $foto_nama_keluar;
+                            } else {
+                                $foto_keluar = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_keluar;
                             }
                         ?>
                             <tr style="<?= $rekap['lokasi_presensi'] == 'Kantor PDAM' ? 'background-color: #add8e6;' : 'background-color: #d1e7dd;'; ?>">
@@ -601,9 +613,9 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                                 <td><?= ($rekap['keterangan']) ?></td>
                                 <td><?= ($rekap['jam_absen']) ?></td>
                                 <td class="text-center">
-                                    <a href="/absensi/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['id_pegawai']) ?>" class="badge badge-pill bg-primary">Rekap</a>
-                                    <a href="/absensi/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
-                                    <a href="/absensi/admin/presensi/hapus.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-danger tombol-hapus">Hapus</a>
+                                    <a href="/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['id_pegawai']) ?>" class="badge badge-pill bg-primary">Rekap</a>
+                                    <a href="/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
+                                    <a href="/admin/presensi/hapus.php?id=<?= htmlspecialchars($rekap['id']) ?>" class="badge badge-pill bg-danger tombol-hapus">Hapus</a>
                                 </td>
                             </tr>
                         <?php endwhile; ?>

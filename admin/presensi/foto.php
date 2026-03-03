@@ -39,8 +39,33 @@ mysqli_free_result($result);
             <div class="col-md-6">
                 <div class="card">
                     <br>
+                    <?php
+                    $foto_nama_masuk = htmlspecialchars($presensi['foto_masuk']);
+                    $foto_masuk_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                    $foto_masuk_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_masuk;
+
+                    if (file_exists($foto_masuk_path_pegawai)) {
+                        $foto_masuk = "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                    } elseif (file_exists($foto_masuk_path_shift)) {
+                        $foto_masuk = "/shift/presensi/foto/" . $foto_nama_masuk;
+                    } else {
+                        $foto_masuk = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_masuk;
+                    }
+
+                    $foto_nama_keluar = htmlspecialchars($presensi['foto_keluar']);
+                    $foto_keluar_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                    $foto_keluar_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_keluar;
+
+                    if (file_exists($foto_keluar_path_pegawai)) {
+                        $foto_keluar = "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                    } elseif (file_exists($foto_keluar_path_shift)) {
+                        $foto_keluar = "/shift/presensi/foto/" . $foto_nama_keluar;
+                    } else {
+                        $foto_keluar = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_keluar;
+                    }
+                    ?>
                     <h3 class="text-center">Foto Masuk<br> <?= $presensi['tanggal_masuk'] ?><br> <?= $presensi['jam_masuk'] ?></h3>
-                    <img style="width: 100%; border-radius: 20px" src="/absensi/pegawai/presensi/foto/<?= $presensi['foto_masuk'] ?>" alt="Foto Masuk">
+                    <img style="width: 100%; border-radius: 20px" src="<?= $foto_masuk ?>" alt="Foto Masuk">
                 </div>
             </div>
 
@@ -48,7 +73,7 @@ mysqli_free_result($result);
                 <div class="card">
                     <br>
                     <h3 class="text-center">Foto Pulang<br> <?= $presensi['tanggal_masuk'] ?><br> <?= $presensi['jam_keluar'] ?></h3>
-                    <img style="width: 100%; border-radius: 20px" src="/absensi/pegawai/presensi/foto/<?= $presensi['foto_keluar'] ?>" alt="Foto Pulang">
+                    <img style="width: 100%; border-radius: 20px" src="<?= $foto_keluar ?>" alt="Foto Pulang">
                 </div>
             </div>
 

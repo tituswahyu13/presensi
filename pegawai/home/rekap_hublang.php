@@ -122,290 +122,141 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
 ?>
 
 <style>
-    /* Variabel warna */
-    :root {
-        --primary-color: #2563eb;
-        --primary-hover: #1d4ed8;
-        --secondary-color: #64748b;
-        --secondary-hover: #475569;
-        --success-color: #22c55e;
-        --danger-color: #ef4444;
-        --warning-color: #f59e0b;
-        --background-light: #f8fafc;
-        --border-color: #e2e8f0;
-        --text-dark: #1e293b;
-        --text-muted: #64748b;
-    }
-
-    .page-body {
-        padding: 20px;
-        background-color: var(--background-light);
-    }
-    
-    .container-xl {
-        background-color: white;
-        padding: 15px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-    }
-
-    .btn {
-        border-radius: 8px;
-        padding: 8px 16px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary {
-        background: var(--primary-color);
-        border: none;
-    }
-
-    .btn-primary:hover {
-        background: var(--primary-hover);
-        transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-        background: var(--secondary-color);
-        border: none;
-    }
-
-    .btn-secondary:hover {
-        background: var(--secondary-hover);
-    }
-
+    /* Tambahkan CSS yang diperlukan agar konsisten dengan tema header.php */
     .table {
-        border-radius: 10px;
+        /* Memastikan border collapse untuk kontrol border yang lebih baik */
+        border-collapse: separate;
+        border-spacing: 0;
+        /* Border luar tabel */
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        /* Sudut membulat */
         overflow: hidden;
-        box-shadow: 0 2px 4px rgb(0 0 0 / 0.05);
+        /* Penting untuk menjaga border-radius */
+        width: 100%;
+        color: var(--text-color);
     }
 
     .table thead th {
+        /* Mengambil warna dari primary color yang didefinisikan di header.php */
         background-color: var(--primary-color);
-        color: white;
-        font-weight: 500;
+        color: var(--bg-color);
+        /* Ubah warna teks menjadi warna latar belakang dark mode */
+        font-weight: 700;
         border: none;
         padding: 12px;
+        /* Menambahkan border di sisi kanan untuk memisahkan kolom */
+        border-right: 1px solid rgba(0, 0, 0, 0.2);
     }
 
-    /* Warna baris tabel */
-    tr[style*="Kantor PDAM"] {
-        background-color: #dbeafe !important; /* Biru muda */
+    .table thead th:last-child {
+        border-right: none;
+        /* Hapus border di kolom terakhir header */
     }
 
-    tr[style*="background-color: #d1e7dd"] {
-        background-color: #dcfce7 !important; /* Hijau muda */
+    .table tbody tr:nth-child(even) {
+        background-color: rgba(18, 18, 25, 0.5);
+        /* Menggunakan warna dark transparan yang sedikit lebih pekat */
     }
 
-    td[style*="background-color: #f0f8ff"] {
-        background-color: #f8fafc !important; /* Abu-abu sangat muda */
+    .table tbody tr:nth-child(odd) {
+        background-color: rgba(18, 18, 25, 0.2);
+        /* Menggunakan warna dark transparan yang lebih terang */
     }
 
-    td[style*="background-color: #e6ffe6"] {
-        background-color: #f0fdf4 !important; /* Hijau sangat muda */
-    }
-
-    td[style*="background-color: #ffe6e6"] {
-        background-color: #fef2f2 !important; /* Merah sangat muda */
-    }
-
-    td[style*="background-color: #fff3e6"] {
-        background-color: #fff7ed !important; /* Orange sangat muda */
-    }
-
-    /* Badge styles */
-    .badge {
+    .table tbody td {
+        /* Menambahkan border di sisi kanan untuk memisahkan kolom data */
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
         padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: 500;
     }
 
-    .badge.bg-success {
-        background-color: var(--success-color) !important;
-    }
-
-    .badge.bg-primary {
-        background-color: var(--primary-color) !important;
-    }
-
-    .badge.bg-secondary {
-        background-color: var(--secondary-color) !important;
-    }
-
-    /* Status colors */
-    span[style*="color: red"] {
-        color: var(--danger-color) !important;
-    }
-
-    /* Input groups */
-    .input-group {
-        box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-    .input-group input {
-        border: 1px solid var(--border-color);
-        padding: 10px;
-    }
-
-    .input-group input:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-    }
-
-    /* Modal styling */
-    .modal-content {
-        border-radius: 15px;
-        border: none;
-    }
-
-    .modal-header {
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 15px 15px 0 0;
+    .table tbody tr:last-child td {
         border-bottom: none;
+        /* Hapus border bawah di baris terakhir */
     }
 
-    .modal-body {
+    .table tbody td:last-child {
+        border-right: none;
+        /* Hapus border di kolom terakhir data */
+    }
+
+
+    /* Mengganti styling yang dihapus dari blok style sebelumnya */
+    .page-body {
         padding: 20px;
+        background-color: var(--bg-color);
+        /* Menggunakan warna latar belakang dari header */
+        color: var(--text-color);
     }
 
-    /* Date display */
-    .date-display {
-        color: var(--text-muted);
-        font-size: 0.95rem;
-        margin: 15px 0;
-    }
-
-    /* Foto column */
-    .foto-column img {
+    .container-xl {
+        background-color: var(--card-bg);
+        /* Menggunakan warna card/bg transparan dari header */
+        padding: 15px;
         border-radius: 10px;
-        box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
-        transition: transform 0.3s ease;
+        box-shadow: 0 0 10px var(--glow-color);
+        /* Efek glow konsisten */
     }
 
-    .foto-column img:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 6px rgb(0 0 0 / 0.1);
-    }
-
-    /* Action buttons container */
-    .action-buttons {
-        background-color: #f8fafc;
+    .action-buttons,
+    .search-container {
+        background-color: rgba(0, 0, 0, 0.2);
+        /* Sedikit gelap untuk kontras */
         padding: 15px;
         border-radius: 10px;
         margin-bottom: 20px;
-        flex-direction: column;
-        align-items: stretch;
+        border: 1px solid var(--border-color);
     }
 
-    /* Filter buttons container */
-    .filter-buttons {
-        background-color: #f8fafc;
-        padding: 10px;
-        border-radius: 10px;
-        display: flex;
-        gap: 8px;
+    /* Mengubah warna tombol agar sesuai dengan tema header */
+    .btn-primary {
+        background: var(--primary-color);
+        color: var(--bg-color);
+        border: 1px solid var(--primary-color);
+        box-shadow: 0 0 5px var(--glow-color);
+    }
+
+    .btn-primary:hover {
+        background: var(--secondary-color);
+        box-shadow: 0 0 8px var(--secondary-color);
+    }
+
+    /* Mengubah warna teks merah agar kontras di dark mode */
+    .text-center span[style*="color: red"] {
+        color: #ff6b6b !important;
+        /* Merah terang */
     }
 
     .foto-column img {
+        border-radius: 10px;
+        /* Tambahkan efek hover yang keren untuk dark mode */
         transition: transform 0.3s ease;
         cursor: pointer;
     }
 
     .foto-column img:hover {
-        transform: scale(1.1);
+        transform: scale(1.05);
     }
 
-    .badge {
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: 500;
+    .date-display {
+        color: var(--text-color);
+        font-size: 0.95rem;
+        margin: 15px 0;
     }
 
-    .input-group {
-        box-shadow: 0 0 10px rgba(0,0,0,0.05);
-        border-radius: 8px;
-        overflow: hidden;
-        width: 100%;
-    }
-
-    .input-group input {
-        border: 1px solid #dee2e6;
-        padding: 10px;
-    }
-
-    .modal-content {
-        border-radius: 15px;
-    }
-
-    .modal-header {
-        background-color: #4361ee;
-        color: white;
-        border-radius: 15px 15px 0 0;
-    }
-
-    .modal-body {
-        padding: 20px;
-    }
-
-    /* Tambahkan CSS baru untuk tombol */
-    .action-buttons .btn {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .filter-buttons {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 20px;
-    }
-
-    .filter-buttons .btn {
-        min-width: 90px;
-        white-space: nowrap;
-    }
-
-    .search-container {
-        margin-top: 15px;
-    }
-
-    .search-container .input-group {
-        max-width: 100%;
-    }
-
-    .date-filter {
-        flex-direction: column;
-    }
-
+    /* Memastikan input-group tetap terlihat bagus */
+    .input-group input,
     .date-filter input[type="date"] {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .export-btn {
-        width: 100%;
-        margin-bottom: 15px;
-    }
-
-    .badge-pill {
-        padding: 8px 12px;
-        text-decoration: none;
-        margin: 0 3px;
-        font-size: 12px;
-    }
-
-    .badge-pill:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
     }
 </style>
 
 <div class="page-body">
     <div class="container-xl">
-        <!-- Bagian Export dan Filter Tanggal -->
         <div class="action-buttons">
             <div class="col-md-12">
                 <form method="GET" class="date-filter">
@@ -418,7 +269,6 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
             </div>
         </div>
 
-        <!-- Bagian Filter dan Pencarian -->
         <div class="row align-items-center">
             <div class="col-md-12">
                 <form method="GET" class="search-container">
@@ -432,7 +282,6 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
             </div>
         </div>
 
-        <!-- Tampilan tanggal -->
         <div class="date-display mb-3">
             <?php if (empty($_GET['tanggal_dari'])) : ?>
                 <span class="text-muted">Rekap Presensi Tanggal: <?= date('d F Y') ?></span>
@@ -459,7 +308,7 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
             <tbody>
                 <?php if ($result->num_rows === 0) { ?>
                     <tr>
-                        <td colspan="10"> Belum ada data </td>
+                        <td colspan="10" class="text-center"> Belum ada data </td>
                     </tr>
                     <?php } else {
                     while ($rekap = $result->fetch_assoc()) :
@@ -620,24 +469,36 @@ $bulan = empty($_GET['tanggal_dari']) ? date('Y-m-d') : $_GET['tanggal_dari'] . 
                         }
 
                         // Determine the photo paths
-                        $foto_masuk = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                        $foto_masuk_path = "/var/www/html/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                        if (!file_exists($foto_masuk_path)) {
-                            $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
+                        $foto_nama_masuk = htmlspecialchars($rekap['foto_masuk']);
+                        $foto_masuk_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                        $foto_masuk_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_masuk;
+
+                        if (file_exists($foto_masuk_path_pegawai)) {
+                            $foto_masuk = "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                        } elseif (file_exists($foto_masuk_path_shift)) {
+                            $foto_masuk = "/shift/presensi/foto/" . $foto_nama_masuk;
+                        } else {
+                            $foto_masuk = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_masuk;
                         }
 
-                        $foto_keluar = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                        $foto_keluar_path = "/var/www/html/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                        if (!file_exists($foto_keluar_path)) {
-                            $foto_keluar = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
+                        $foto_nama_keluar = htmlspecialchars($rekap['foto_keluar']);
+                        $foto_keluar_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                        $foto_keluar_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_keluar;
+
+                        if (file_exists($foto_keluar_path_pegawai)) {
+                            $foto_keluar = "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                        } elseif (file_exists($foto_keluar_path_shift)) {
+                            $foto_keluar = "/shift/presensi/foto/" . $foto_nama_keluar;
+                        } else {
+                            $foto_keluar = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_keluar;
                         }
                     ?>
-                        <tr style="<?= $rekap['lokasi_presensi'] == 'Kantor PDAM' ? 'background-color: #add8e6;' : 'background-color: #d1e7dd;'; ?>">
-                            <td style="background-color: #f0f8ff;"><?= htmlspecialchars($rekap['nama']) ?></td>
-                            <td style="background-color: #e6ffe6;" class="text-center"><?= !empty($rekap['tanggal_masuk']) ? date('d F Y', strtotime($rekap['tanggal_masuk'])) : '<span style="color: red;">Belum presensi</span>' ?></td>
-                            <td style="background-color: #e6ffe6;" class="text-center"><?= htmlspecialchars($rekap['jam_masuk']) ?></td>
-                            <td style="background-color: #ffe6e6;"><?= !empty($rekap['tanggal_keluar']) ? date('d F Y', strtotime($rekap['tanggal_keluar'])) : '' ?></td>
-                            <td style="background-color: #fff3e6;" class="text-center"><?= htmlspecialchars($rekap['jam_keluar']) ?></td>
+                        <tr>
+                            <td><?= htmlspecialchars($rekap['nama']) ?></td>
+                            <td class="text-center"><?= !empty($rekap['tanggal_masuk']) ? date('d F Y', strtotime($rekap['tanggal_masuk'])) : '<span style="color: red;">Belum presensi</span>' ?></td>
+                            <td class="text-center"><?= htmlspecialchars($rekap['jam_masuk']) ?></td>
+                            <td><?= !empty($rekap['tanggal_keluar']) ? date('d F Y', strtotime($rekap['tanggal_keluar'])) : '' ?></td>
+                            <td class="text-center"><?= htmlspecialchars($rekap['jam_keluar']) ?></td>
                             <td class="text-center">
                                 <?= ($total_jam_terlambat < 0 && !empty($rekap['jam_masuk'])) ? '<span class="badge bg-success">On Time</span>' : (!empty($rekap['jam_masuk']) ? '<span style="color: red; font-weight: bold;">' . $total_jam_terlambat . ' Jam ' . $selisih_menit_terlambat . ' Menit</span>' : '') ?>
                             </td>

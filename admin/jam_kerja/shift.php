@@ -279,7 +279,7 @@ input[type="time"]:focus {
             </div>
         <?php endif; ?>
 
-        <form action="/absensi/admin/jam_kerja/shift.php" method="POST">
+        <form action="/admin/jam_kerja/shift.php" method="POST">
             <div class="row">
                 <div class="col-12">
                     <div class="card">

@@ -47,7 +47,7 @@ $result = mysqli_query($connection, "SELECT users.id_pegawai, users.username, us
                     <div class="row g-3 align-items-center">
                         <div class="col-auto">
                             <span class="avatar avatar-xl rounded-circle border" style="
-                                background-image: url('/absensi/assets/img/foto_pegawai/<?= $pegawai['foto'] ?>');
+                                background-image: url('/assets/img/foto_pegawai/<?= $pegawai['foto'] ?>');
                                 background-position: top center;
                                 background-size: cover;
                                 background-repeat: no-repeat;

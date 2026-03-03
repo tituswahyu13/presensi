@@ -179,8 +179,8 @@ echo $tahun_bulan;
                                 <?php endif; ?>
                             </td>
                             <td class="text-center">
-                                <a href="/absensi/admin/presensi/foto.php?id=<?= $rekap['id'] ?>" class="badge badge-pill bg-primary">Foto</a>
-                                <a href="/absensi/admin/presensi/rekap.php?id=<?= $rekap['id_pegawai'] ?>" class="badge badge-pill bg-primary">Rekap</a>
+                                <a href="/admin/presensi/foto.php?id=<?= $rekap['id'] ?>" class="badge badge-pill bg-primary">Foto</a>
+                                <a href="/admin/presensi/rekap.php?id=<?= $rekap['id_pegawai'] ?>" class="badge badge-pill bg-primary">Rekap</a>
                             </td>
                         </tr>
                     <?php endwhile; ?>
@@ -197,7 +197,7 @@ echo $tahun_bulan;
                 <h5 class="modal-title">Ekspor Excel Rekap Bulanan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="/absensi/admin/presensi/rekap_bulanan_excel.php">
+            <form method="POST" action="/admin/presensi/rekap_bulanan_excel.php">
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="">Bulan</label>

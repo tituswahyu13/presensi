@@ -1,60 +1,11 @@
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-<style>
-  #map {
-    height: 300px;
-  }
-</style>
-
-<style>
-  .card-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .card-header {
-    text-align: center;
-    margin: auto;
-    font-size: 20px;
-    font-weight: bold;
-  }
-
-  .parent_date {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto;
-    font-size: 25px;
-    text-align: center;
-    justify-content: center;
-  }
-
-  .parent_clock {
-    display: grid;
-    grid-template-columns: auto auto auto auto auto;
-    font-size: 40px;
-    text-align: center;
-    font-weight: bold;
-    justify-content: center;
-  }
-
-  #latitude_pegawai,
-  #longitude_pegawai {
-    width: 180px;
-    padding: 8px;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-</style>
-
 <?php
 session_start();
 // date_default_timezone_set('Asia/Jakarta');
 if (!isset($_SESSION["login"])) {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
+  header("Location: ../../auth/login.php?pesan=belum_login");
   exit();
 } elseif ($_SESSION["role"] == "admin") {
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
+  header("Location: ../../auth/login.php?pesan=tolak_akses");
   exit();
 }
 
@@ -64,7 +15,6 @@ include('../layout/header.php');
 include_once("../../config.php");
 
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : '';
-echo $username;
 
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
 $result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = 'Event'");
@@ -93,14 +43,218 @@ if (isset($zona_waktu)) {
 
 ?>
 
-<!-- Page body -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  /* Menggunakan variabel warna dari header.php */
+  :root {
+    --primary-color: #00e0b3; /* Hijau neon */
+    --secondary-color: #00a4d4; /* Biru elektrik */
+    --bg-color: #0a0a0d;
+    --card-bg: rgba(18, 18, 25, 0.7);
+    --text-color: #e0e0e0;
+    --border-color: rgba(0, 224, 179, 0.3);
+    --glow-color: rgba(0, 224, 179, 0.5);
+    --dark-text: #333;
+  }
+
+  /* Efek Latar Belakang */
+  body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    font-feature-settings: "cv03", "cv04", "cv11";
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(circle, #1e1e2d 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.2;
+    z-index: -1;
+    animation: pan-grid 60s linear infinite;
+  }
+
+  @keyframes pan-grid {
+    from {
+      background-position: 0 0;
+    }
+
+    to {
+      background-position: -2000px 2000px;
+    }
+  }
+
+  .futuristic-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 10% 20%, rgba(0, 224, 179, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(0, 164, 212, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -2;
+  }
+
+  /* Card Styling */
+  .card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    box-shadow: 0 0 25px var(--glow-color);
+    transition: transform 0.3s ease-in-out;
+    height: 100%;
+  }
+
+  .card:hover {
+    transform: translateY(-5px);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    color: var(--text-color);
+  }
+
+  .card-header {
+    /* Perbaikan Utama: Tambahkan display: flex, justify-content: center, dan align-items: center */
+    display: flex;
+    flex-direction: column; /* Konten di header akan disusun vertikal (karena ada <br>) */
+    justify-content: center; /* Rata tengah vertikal */
+    align-items: center; /* Rata tengah horizontal */
+    
+    /* Styling dari kode sebelumnya */
+    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px;
+    color: #fff;
+    text-shadow: 0 0 5px var(--primary-color);
+  }
+  
+  /* Hilangkan margin/padding yang mungkin mengganggu perataan vertikal pada elemen di dalam header (jika ada) */
+  .card-header > * {
+    margin: 0;
+    padding: 0;
+  }
+
+
+  /* Time/Date Styling */
+  .parent_date,
+  .parent_clock {
+    font-family: 'Orbitron', sans-serif;
+  }
+
+  .parent_date {
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+    color: var(--primary-color);
+    margin-top: 10px;
+  }
+
+  .parent_date div+div {
+    margin-left: 10px;
+  }
+
+  .parent_clock {
+    display: flex;
+    font-size: 35px;
+    justify-content: center;
+    font-weight: bold;
+    color: var(--secondary-color);
+    margin-top: 5px;
+  }
+
+  .parent_clock div+div {
+    margin-left: 5px;
+  }
+
+  /* Input Fields */
+  #latitude_pegawai,
+  #longitude_pegawai {
+    width: 180px;
+    padding: 8px;
+    margin-bottom: 10px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: #fff;
+    border-radius: 10px;
+  }
+
+  /* Button Styling (Hadir/Masuk) */
+  .btn {
+    border: none;
+    border-radius: 10px;
+    padding: 15px 25px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .btn-green {
+    background: linear-gradient(45deg, #00e0b3, #00a4d4) !important;
+    box-shadow: 0 4px 15px rgba(0, 224, 179, 0.4);
+    color: #fff;
+  }
+
+  .btn-green:hover {
+    background: linear-gradient(45deg, #00a4d4, #00e0b3) !important;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 224, 179, 0.6);
+  }
+
+  /* Status Icon & Text */
+  .fa-circle-check {
+    color: var(--primary-color) !important;
+    text-shadow: 0 0 10px var(--primary-color);
+  }
+  
+  .text-success {
+    color: var(--primary-color) !important;
+  }
+  
+  h4 {
+    color: var(--text-color);
+  }
+
+  #map {
+    height: 300px;
+    border-radius: 15px;
+    border: 1px solid var(--border-color);
+  }
+</style>
+
 <div class="page-body">
+  <div class="futuristic-overlay"></div>
   <div class="container-xl">
-    <div class="col">
-      <div class="col-md-2"></div>
-      <img src="/absensi/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" width="100" height="150">
-      <div class="col-md-4">
-        <div class="card text-center h-50">
+    <div class="row justify-content-center">
+      
+      <div class="col-12 mb-4 d-flex justify-content-start">
+        <img src="/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
+      </div>
+
+      <div class="col-12 col-md-8 col-lg-6"> 
+        <div class="card text-center h-100">
           <div class="card-header">Daftar Hadir <br> <?php echo $alamat_lokasi; ?></div>
           <div class="card-body">
 
@@ -109,7 +263,6 @@ if (isset($zona_waktu)) {
             $tanggal_hari_ini = date("Y-m-d");
 
             $cek_presensi_masuk = mysqli_query($connection, "SELECT * FROM presensi.event WHERE id_pegawai = '$id_pegawai' AND tanggal IS NULL");
-            // $cek_presensi_masuk = mysqli_query($connection, "SELECT * FROM presensi.event WHERE id_pegawai = '$id_pegawai' AND tanggal_masuk = '$tanggal_hari_ini'"); //atau ganti tanggal_keluar IS NULL kalau shift beda hari
             ?>
 
             <?php if (mysqli_num_rows($cek_presensi_masuk) === 0) { ?>
@@ -148,7 +301,6 @@ if (isset($zona_waktu)) {
         </div>
       </div>
       
-      <div class="col-md-2"></div>
     </div>
   </div>
 </div>
@@ -160,12 +312,12 @@ if (isset($zona_waktu)) {
   function waktuMasuk() {
     const waktu = new Date();
     setTimeout("waktuMasuk()", 1000);
-    document.getElementById("tanggal_masuk").innerHTML = waktu.getDate();
+    document.getElementById("tanggal_masuk").innerHTML = String(waktu.getDate()).padStart(2, '0');
     document.getElementById("bulan_masuk").innerHTML = namaBulan[waktu.getMonth()];
     document.getElementById("tahun_masuk").innerHTML = waktu.getFullYear();
-    document.getElementById("jam_masuk").innerHTML = waktu.getHours();
-    document.getElementById("menit_masuk").innerHTML = waktu.getMinutes();
-    document.getElementById("detik_masuk").innerHTML = waktu.getSeconds();
+    document.getElementById("jam_masuk").innerHTML = String(waktu.getHours()).padStart(2, '0');
+    document.getElementById("menit_masuk").innerHTML = String(waktu.getMinutes()).padStart(2, '0');
+    document.getElementById("detik_masuk").innerHTML = String(waktu.getSeconds()).padStart(2, '0');
   }
 
   getLocation();

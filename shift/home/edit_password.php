@@ -69,7 +69,7 @@ while ($pegawai = mysqli_fetch_array($result)) {
 <!-- Page body -->
 <div class="page-body">
     <div class="container-xl">
-        <form action="/absensi/shift/home/edit_password.php" method="POST" enctype="multipart/form-data">
+        <form action="/shift/home/edit_password.php" method="POST" enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">

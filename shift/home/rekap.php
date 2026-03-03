@@ -266,16 +266,28 @@ $total_terlambat = 0;
                             }
 
                             // Determine the photo paths
-                            $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                            $foto_masuk_path = "/var/www/html/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                            if (!file_exists($foto_masuk_path)) {
-                                $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
+                            $foto_nama_masuk = htmlspecialchars($rekap['foto_masuk']);
+                            $foto_masuk_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_masuk;
+                            $foto_masuk_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_masuk;
+
+                            if (file_exists($foto_masuk_path_shift)) {
+                                $foto_masuk = "/shift/presensi/foto/" . $foto_nama_masuk;
+                            } elseif (file_exists($foto_masuk_path_pegawai)) {
+                                $foto_masuk = "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            } else {
+                                $foto_masuk = "https://internal.pdamkotamagelang.com/shift/presensi/foto/" . $foto_nama_masuk;
                             }
 
-                            $foto_keluar = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                            $foto_keluar_path = "/var/www/html/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                            if (!file_exists($foto_keluar_path)) {
-                                $foto_keluar = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
+                            $foto_nama_keluar = htmlspecialchars($rekap['foto_keluar']);
+                            $foto_keluar_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_keluar;
+                            $foto_keluar_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_keluar;
+
+                            if (file_exists($foto_keluar_path_shift)) {
+                                $foto_keluar = "/shift/presensi/foto/" . $foto_nama_keluar;
+                            } elseif (file_exists($foto_keluar_path_pegawai)) {
+                                $foto_keluar = "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                            } else {
+                                $foto_keluar = "https://internal.pdamkotamagelang.com/shift/presensi/foto/" . $foto_nama_keluar;
                             }
 
                             ?>
@@ -339,7 +351,7 @@ $total_terlambat = 0;
                     <h5 class="modal-title">Ekspor Excel Rekap Harian</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" action="/absensi/admin/presensi/rekap_harian_excel.php">
+                <form method="POST" action="/admin/presensi/rekap_harian_excel.php">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="">Tanggal Awal</label>

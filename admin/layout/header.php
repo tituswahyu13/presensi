@@ -25,18 +25,18 @@ if (isset($_SESSION["nama"])) {
   <meta http-equiv="X-UA-Compatible" content="ie=edge" />
   <title>StorRai</title>
   <!-- CSS files -->
-  <link href="/absensi/assets/css/tabler.min.css?1684106062" rel="stylesheet" />
-  <link href="/absensi/assets/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
-  <link href="/absensi/assets/css/demo.min.css?1684106062" rel="stylesheet" />
+  <link href="/assets/css/tabler.min.css?1684106062" rel="stylesheet" />
+  <link href="/assets/css/tabler-vendors.min.css?1684106062" rel="stylesheet" />
+  <link href="/assets/css/demo.min.css?1684106062" rel="stylesheet" />
   <!-- font awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <link rel="icon" href="/absensi/icons/icon.png" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="/absensi/icons/icon.png"> <!-- iOS icon -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/absensi/icons/icon.png"> <!-- Desktop icon -->
-  <link rel="icon" type="image/png" sizes="16x16" href="/absensi/icons/icon.png"> <!-- Small icon -->
+  <link rel="icon" href="/icons/icon.png" type="image/x-icon" />
+  <link rel="apple-touch-icon" href="/icons/icon.png"> <!-- iOS icon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon.png"> <!-- Desktop icon -->
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon.png"> <!-- Small icon -->
 
   <style>
     @import url('https://rsms.me/inter/inter.css');
@@ -75,7 +75,7 @@ if (isset($_SESSION["nama"])) {
         </button>
         <h1 class="navbar-brand navbar-brand-autodark d-none-navbar-horizontal pe-0 pe-md-3">
           <a href="<?= ('../../admin/home/home.php') ?>">
-            <img src="/absensi/assets/img/logo.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
+            <img src="/assets/img/logo.png" width="110" height="32" alt="Tabler" class="navbar-brand-image">
           </a>
         </h1>
         <div class="navbar-nav flex-row order-md-last">
@@ -88,7 +88,7 @@ if (isset($_SESSION["nama"])) {
               </div>
             </a>
             <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-              <a href="/absensi/auth/logout.php" class="dropdown-item">Logout</a>
+              <a href="/auth/logout.php" class="dropdown-item">Logout</a>
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ if (isset($_SESSION["nama"])) {
                 </a>
               </li> -->
               <!-- <li class="nav-item">
-                <a class="nav-link" href="/absensi/auth/logout.php">
+                <a class="nav-link" href="/auth/logout.php">
                   <span class="nav-link-icon d-md-none d-lg-inline-block">
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-logout" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none" />

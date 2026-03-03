@@ -6,12 +6,12 @@ session_start();
 
 if (!isset($_SESSION["login"])) {
 
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
+  header("Location: ../../auth/login.php?pesan=belum_login");
 
   exit();
 } elseif ($_SESSION["role"] != "pegawai") {
 
-  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
+  header("Location: ../../auth/login.php?pesan=tolak_akses");
 
   exit();
 }
@@ -30,28 +30,21 @@ include_once("../../config.php");
 
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : '';
 
-echo $username;
 
 
 
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
 
-$result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
-
-//$result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = 'Event'");
-
-
+$stmt = mysqli_prepare($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = ?");
+mysqli_stmt_bind_param($stmt, "s", $lokasi_presensi);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 while ($lokasi = mysqli_fetch_array($result)) {
-
   $latitude_kantor = $lokasi["latitude"];
-
   $longitude_kantor = $lokasi["longitude"];
-
   $radius = $lokasi["radius"];
-
   $zona_waktu = $lokasi["zona_waktu"];
-
   $jam_pulang = $lokasi["jam_pulang"];
 }
 
@@ -734,7 +727,7 @@ margin-bottom: 20px;
 
       <div class="col-lg-12 text-center">
 
-        <img src="/absensi/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
+        <img src="/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
 
       </div>
 

@@ -841,13 +841,28 @@ $bulan = empty($_GET['tanggal_dari'])
                         </tr>
                         <?php } else {
                         foreach ($filtered_data as $rekap) {
-                            $foto_masuk = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
-                            if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $foto_masuk)) {
-                                $foto_masuk = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_masuk']);
+                            $foto_nama_masuk = htmlspecialchars($rekap['foto_masuk']);
+                            $foto_masuk_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            $foto_masuk_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_masuk;
+
+                            if (file_exists($foto_masuk_path_pegawai)) {
+                                $foto_masuk = "/pegawai/presensi/foto/" . $foto_nama_masuk;
+                            } elseif (file_exists($foto_masuk_path_shift)) {
+                                $foto_masuk = "/shift/presensi/foto/" . $foto_nama_masuk;
+                            } else {
+                                $foto_masuk = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_masuk;
                             }
-                            $foto_keluar = "/absensi/pegawai/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
-                            if (!file_exists($_SERVER['DOCUMENT_ROOT'] . $foto_keluar)) {
-                                $foto_keluar = "/absensi/shift/presensi/foto/" . htmlspecialchars($rekap['foto_keluar']);
+
+                            $foto_nama_keluar = htmlspecialchars($rekap['foto_keluar']);
+                            $foto_keluar_path_pegawai = $_SERVER['DOCUMENT_ROOT'] . "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                            $foto_keluar_path_shift = $_SERVER['DOCUMENT_ROOT'] . "/shift/presensi/foto/" . $foto_nama_keluar;
+
+                            if (file_exists($foto_keluar_path_pegawai)) {
+                                $foto_keluar = "/pegawai/presensi/foto/" . $foto_nama_keluar;
+                            } elseif (file_exists($foto_keluar_path_shift)) {
+                                $foto_keluar = "/shift/presensi/foto/" . $foto_nama_keluar;
+                            } else {
+                                $foto_keluar = "https://internal.pdamkotamagelang.com/pegawai/presensi/foto/" . $foto_nama_keluar;
                             }
                         ?>
                             <tr>
@@ -925,9 +940,9 @@ $bulan = empty($_GET['tanggal_dari'])
                                 <td><?= ($rekap['keterangan'] ?? '-') ?></td>
                                 <td><?= ($rekap['jam_absen'] ?? '-') ?></td>
                                 <td class="text-center">
-                                    <a href="/absensi/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
-                                    <a href="/absensi/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['presensi_id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
-                                    <a href="/absensi/admin/presensi/hapus.php?id=<?= htmlspecialchars($rekap['presensi_id']) ?>" class="badge badge-pill bg-danger tombol-hapus">Hapus</a>
+                                    <a href="/admin/presensi/rekap.php?id=<?= htmlspecialchars($rekap['pegawai_id']) ?>" class="badge badge-pill bg-primary">Rekap</a>
+                                    <a href="/admin/presensi/edit.php?id=<?= htmlspecialchars($rekap['presensi_id']) ?>" class="badge badge-pill bg-secondary">Edit</a>
+                                    <a href="/admin/presensi/hapus.php?id=<?= htmlspecialchars($rekap['presensi_id']) ?>" class="badge badge-pill bg-danger tombol-hapus">Hapus</a>
                                 </td>
                             </tr>
                     <?php }
@@ -1016,7 +1031,18 @@ ob_end_flush();
 
         function parseIndonesianDate(dateStr) {
             const months = {
-                'Januari': 0, 'Februari': 1, 'Maret': 2, 'April': 3, 'Mei': 4, 'Juni': 5, 'Juli': 6, 'Agustus': 7, 'September': 8, 'Oktober': 9, 'November': 10, 'Desember': 11
+                'Januari': 0,
+                'Februari': 1,
+                'Maret': 2,
+                'April': 3,
+                'Mei': 4,
+                'Juni': 5,
+                'Juli': 6,
+                'Agustus': 7,
+                'September': 8,
+                'Oktober': 9,
+                'November': 10,
+                'Desember': 11
             };
             const parts = dateStr.split(' ');
             if (parts.length !== 3) return new Date(0);
