@@ -6,12 +6,12 @@ session_start();
 
 if (!isset($_SESSION["login"])) {
 
-  header("Location: ../../auth/login.php?pesan=belum_login");
+  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=belum_login");
 
   exit();
 } elseif ($_SESSION["role"] != "pegawai") {
 
-  header("Location: ../../auth/login.php?pesan=tolak_akses");
+  header("Location: https://internal.pdamkotamagelang.com/absensi/auth/login.php?pesan=tolak_akses");
 
   exit();
 }
@@ -30,21 +30,28 @@ include_once("../../config.php");
 
 $username = isset($_SESSION["username"]) ? $_SESSION["username"] : '';
 
+echo $username;
 
 
 
 $lokasi_presensi = $_SESSION['lokasi_presensi'];
 
-$stmt = mysqli_prepare($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = ?");
-mysqli_stmt_bind_param($stmt, "s", $lokasi_presensi);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = '$lokasi_presensi'");
+
+//$result = mysqli_query($connection, "SELECT * FROM lokasi_presensi WHERE nama_lokasi = 'Event'");
+
+
 
 while ($lokasi = mysqli_fetch_array($result)) {
+
   $latitude_kantor = $lokasi["latitude"];
+
   $longitude_kantor = $lokasi["longitude"];
+
   $radius = $lokasi["radius"];
+
   $zona_waktu = $lokasi["zona_waktu"];
+
   $jam_pulang = $lokasi["jam_pulang"];
 }
 
@@ -533,9 +540,9 @@ if (isset($zona_waktu)) {
 
 
   #map {
-    height: 350px !important;
+    height: 300px !important;
     width: 100% !important;
-    min-height: 350px !important;
+    min-height: 300px !important;
     border-radius: 15px;
     border: 1px solid var(--border-color);
     z-index: 1 !important;
@@ -602,6 +609,277 @@ if (isset($zona_waktu)) {
   
   #presensi-status.not-allowed {
     color: #ff5050 !important;
+  }
+  
+  .status-info-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    backdrop-filter: blur(10px);
+  }
+  
+  .status-item {
+    text-align: center;
+    padding: 10px;
+    background: rgba(0, 224, 179, 0.1);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .status-item:hover {
+    background: rgba(0, 224, 179, 0.2);
+    transform: translateY(-2px);
+  }
+  
+  .status-item small {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+  }
+  
+  .status-item .fw-bold {
+    font-size: 1rem;
+    color: var(--primary-color);
+  }
+  
+  .status-item-compact {
+    text-align: center;
+    padding: 8px 5px;
+    background: rgba(0, 224, 179, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+  
+  .status-item-compact:hover {
+    background: rgba(0, 224, 179, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  .status-item-compact small {
+    font-size: 0.7rem;
+    margin-bottom: 3px;
+  }
+  
+  .status-item-compact .fw-bold {
+    font-size: 0.85rem;
+    color: var(--primary-color);
+  }
+  
+  /* Modern Status Design */
+  .profile-img {
+    /* border-radius: 15px; */
+    /* box-shadow: 0 0 20px rgba(0, 224, 179, 0.3); */
+    transition: all 0.3s ease;
+    float: left;
+    margin-right: 15px;
+    max-width: 100%;
+  }
+  
+  .profile-img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 224, 179, 0.5);
+  }
+  
+  .status-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .status-item-modern {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .status-item-modern:hover {
+    background: rgba(0, 224, 179, 0.1);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 224, 179, 0.2);
+  }
+  
+  .status-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .status-icon i {
+    color: white;
+    font-size: 1.2rem;
+  }
+  
+  .status-content {
+    flex-grow: 1;
+  }
+  
+  .status-label {
+    display: block;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3px;
+  }
+  
+  .status-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+  }
+  
+  .status-value i {
+    margin-right: 5px;
+  }
+  
+  /* Compact Status List */
+  .status-compact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+    /* max-width: 200px; */
+  }
+  
+  .status-compact-item {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 224, 179, 0.1);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+  }
+  
+  .status-compact-item:hover {
+    background: rgba(0, 224, 179, 0.2);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+  }
+  
+  .status-compact-item i {
+    color: var(--primary-color);
+    margin-right: 8px;
+    font-size: 0.9rem;
+    width: 16px;
+    text-align: center;
+  }
+  
+  .status-compact-item span {
+    color: var(--text-color);
+    font-weight: 500;
+  }
+  
+  /* Mobile Optimization */
+  @media (max-width: 768px) {
+    .status-info-card {
+      padding: 15px;
+      margin-top: 15px;
+    }
+    
+    .status-item {
+      padding: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .status-item small {
+      font-size: 0.75rem;
+    }
+    
+    .status-item .fw-bold {
+      font-size: 0.9rem;
+    }
+    
+    #map {
+      height: 300px !important;
+      max-width: 100% !important;
+    }
+  }
+  
+  /* Stack on very small screens */
+  @media (max-width: 576px) {
+    .status-info-card .row {
+      flex-direction: column;
+    }
+    
+    .status-info-card .col-6 {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    
+    .status-item-compact {
+      padding: 10px;
+      margin-bottom: 5px;
+    }
+    
+    .status-item-compact small {
+      font-size: 0.8rem;
+    }
+    
+    .status-item-compact .fw-bold {
+      font-size: 0.95rem;
+    }
+    
+    /* Modern Design Mobile */
+    .profile-img {
+      height: 150px;
+    }
+    
+    .status-grid {
+      gap: 10px;
+    }
+    
+    .status-item-modern {
+      padding: 12px;
+    }
+    
+    .status-icon {
+      width: 35px;
+      height: 35px;
+      margin-right: 12px;
+    }
+    
+    .status-icon i {
+      font-size: 1rem;
+    }
+    
+    .status-label {
+      font-size: 0.75rem;
+    }
+    
+    .status-value {
+      font-size: 0.9rem;
+    }
+    
+    /* Compact Status Mobile */
+    .status-compact-list {
+      gap: 6px;
+      margin-top: 10px;
+    }
+    
+    .status-compact-item {
+      padding: 6px 10px;
+      font-size: 0.8rem;
+    }
+    
+    .status-compact-item i {
+      font-size: 0.8rem;
+      width: 14px;
+      margin-right: 6px;
+    }
   }
 
 
@@ -787,13 +1065,29 @@ margin-bottom: 20px;
 
     <div class="row row-deck g-4">
 
-      <div class="col-lg-12 text-center mb-4">
-
-        <img src="/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
-
-      </div>
-
-      
+      <div class="col-lg-12">
+        <div class="row g-4 align-items-start">
+          <!-- Foto Kiri -->
+          <div class="col-md-5 text-start">
+            <img src="/absensi/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="120" class="profile-img">
+            
+            <!-- Status Ringkas di Bawah Foto -->
+            <div class="status-compact-list mt-3">
+              <div class="status-compact-item">
+                <i class="fa-solid fa-satellite-dish"></i>
+                <span id="gps-status">
+                  <i class="fa-solid fa-spinner fa-spin"></i> GPS
+                </span>
+              </div>
+              <div class="status-compact-item">
+                <i class="fa-solid fa-map-marker-alt"></i>
+                <span id="presensi-status">-</span>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+          
+          <!-- Presensi Masuk Tengah -->
 
       <div class="col-md-6 col-lg-4">
 
@@ -1147,46 +1441,13 @@ margin-bottom: 20px;
 
       <div class="col-lg-12 mb-4">
         <div class="card">
-          <div class="card-header text-center">Lokasi & Status Presensi</div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-4">
-                <h6 class="text-center mb-3" style="color: var(--primary-color);">Posisi Anda</h6>
-                <div class="location-info">
-                  <small class="text-muted">Latitude:</small>
-                  <div id="current-lat" class="fw-bold">Mendeteksi...</div>
-                </div>
-                <div class="location-info mt-2">
-                  <small class="text-muted">Longitude:</small>
-                  <div id="current-lng" class="fw-bold">Mendeteksi...</div>
-                </div>
-                <div class="location-info mt-2">
-                  <small class="text-muted">Status GPS:</small>
-                  <div id="gps-status" class="fw-bold">
-                    <i class="fa-solid fa-spinner fa-spin"></i> Mencari GPS...
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <h6 class="text-center mb-3" style="color: var(--primary-color);">Jarak & Status</h6>
-                <div class="location-info">
-                  <small class="text-muted">Jarak ke Kantor:</small>
-                  <div id="distance-info" class="fw-bold">-</div>
-                </div>
-                <div class="location-info mt-3">
-                  <small class="text-muted">Status Presensi:</small>
-                  <div id="presensi-status" class="fw-bold">-</div>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <h6 class="text-center mb-3" style="color: var(--primary-color);">Peta Lokasi</h6>
-                <div id="map" style="height: 300px; width: 100%; aspect-ratio: 1/1; z-index: 1;"></div>
-              </div>
-            </div>
+          <div class="card-header text-center">Peta Lokasi</div>
+          <div class="card-body text-center">
+            <div id="map" style="height: 350px; width: 100%; max-width: 500px; margin: 0 auto; aspect-ratio: 1/1; z-index: 1;"></div>
           </div>
         </div>
       </div>
-      
+
     </div>
 
   </div>
@@ -1283,6 +1544,28 @@ margin-bottom: 20px;
     $('#current-lng').text(position.coords.longitude.toFixed(8));
     $('#gps-status').html('<i class="fa-solid fa-check-circle"></i> GPS Aktif');
 
+    // Update marker user di peta jika peta sudah ada
+    if (window.homeMap && window.userMarker) {
+        // Hapus marker lama
+        window.homeMap.removeLayer(window.userMarker);
+        
+        // Tambah marker baru dengan posisi terbaru
+        window.userMarker = L.marker([position.coords.latitude, position.coords.longitude], {
+            icon: L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        }).addTo(window.homeMap)
+            .bindPopup("Posisi Anda<br>Jarak: " + calculateDistance(position.coords.latitude, position.coords.longitude, latitude_ktr, longitude_ktr) + " meter")
+            .openPopup();
+            
+        console.log('User marker updated to new position');
+    }
+
     // Hitung jarak ke kantor
     let latitude_ktr = <?= $latitude_kantor ?>;
     let longitude_ktr = <?= $longitude_kantor ?>;
@@ -1301,6 +1584,8 @@ margin-bottom: 20px;
       $('#presensi-status').removeClass('allowed').addClass('not-allowed');
       $('#presensi-status').html('<i class="fa-solid fa-times-circle"></i> Luar Area');
     }
+
+
 
     // Mengisi koordinat untuk form pengajuan
 
@@ -1451,16 +1736,16 @@ setTimeout(function() {
 
     if (latitude_ktr && longitude_ktr) {
         try {
-            let map = L.map('map').setView([latitude_ktr, longitude_ktr], 16);
+            window.homeMap = L.map('map').setView([latitude_ktr, longitude_ktr], 16);
             console.log('Home map initialized');
 
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            }).addTo(window.homeMap);
 
             // Marker lokasi kantor
-            var marker_kantor = L.marker([latitude_ktr, longitude_ktr]).addTo(map)
+            var marker_kantor = L.marker([latitude_ktr, longitude_ktr]).addTo(window.homeMap)
                 .bindPopup("Lokasi Kantor<br>Radius: " + radius_ktr + " meter")
                 .openPopup();
 
@@ -1470,30 +1755,64 @@ setTimeout(function() {
                 fillColor: '#00e0b3',
                 fillOpacity: 0.2,
                 radius: radius_ktr
-            }).addTo(map);
+            }).addTo(window.homeMap);
 
-            // Marker lokasi user (selalu tampilkan jika GPS aktif)
-            if (latitude_peg && longitude_peg) {
-                var marker_user = L.marker([latitude_peg, longitude_peg], {
-                    icon: L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowSize: [41, 41]
-                    })
-                }).addTo(map)
-                    .bindPopup("Posisi Anda<br>Jarak: " + calculateDistance(latitude_peg, longitude_peg, latitude_ktr, longitude_ktr) + " meter")
-                    .openPopup();
+            // Marker lokasi user dengan retry mechanism
+            var marker_user = null;
+            
+            function addUserMarker() {
+                let current_lat = $('#latitude_pegawai').val();
+                let current_lng = $('#longitude_pegawai').val();
+                
+                if (current_lat && current_lng && current_lat !== '' && current_lng !== '') {
+                    // Hapus marker lama jika ada
+                    if (window.userMarker) {
+                        window.homeMap.removeLayer(window.userMarker);
+                    }
+                    
+                    // Tambah marker baru
+                    window.userMarker = L.marker([current_lat, current_lng], {
+                        icon: L.icon({
+                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                            iconSize: [25, 41],
+                            iconAnchor: [12, 41],
+                            popupAnchor: [1, -34],
+                            shadowSize: [41, 41]
+                        })
+                    }).addTo(window.homeMap)
+                        .bindPopup("Posisi Anda<br>Jarak: " + calculateDistance(current_lat, current_lng, latitude_ktr, longitude_ktr) + " meter")
+                        .openPopup();
+                    
+                    console.log('User marker added at:', current_lat, current_lng);
+                    return true;
+                } else {
+                    console.log('User coordinates not available yet');
+                    return false;
+                }
+            }
+            
+            // Coba tambahkan marker sekarang
+            if (!addUserMarker()) {
+                // Retry setiap 2 detik sampai marker berhasil ditambahkan
+                var retryInterval = setInterval(function() {
+                    if (addUserMarker()) {
+                        clearInterval(retryInterval);
+                    }
+                }, 2000);
+                
+                // Stop retry setelah 10 detik
+                setTimeout(function() {
+                    clearInterval(retryInterval);
+                }, 10000);
             }
 
             // Tambahkan kontrol scale
-            L.control.scale().addTo(map);
+            L.control.scale().addTo(window.homeMap);
 
             // Force map to redraw
             setTimeout(function() {
-                map.invalidateSize();
+                window.homeMap.invalidateSize();
                 console.log('Home map size invalidated');
             }, 100);
 
