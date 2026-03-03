@@ -533,13 +533,75 @@ if (isset($zona_waktu)) {
 
 
   #map {
-
-    height: 300px;
-
+    height: 350px !important;
+    width: 100% !important;
+    min-height: 350px !important;
     border-radius: 15px;
-
     border: 1px solid var(--border-color);
-
+    z-index: 1 !important;
+    background: #1a1a1a !important;
+    position: relative !important;
+  }
+  
+  .leaflet-container {
+    height: 100% !important;
+    width: 100% !important;
+    background: #1a1a1a !important;
+  }
+  
+  /* Modifikasi untuk pop-up Leaflet */
+  .leaflet-popup-content-wrapper, .leaflet-popup-tip {
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 0 10px rgba(0, 224, 179, 0.2);
+  }
+  
+  .leaflet-popup-content-wrapper {
+    border-radius: 10px;
+  }
+  
+  .location-info {
+    text-align: left;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .location-info small {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+  
+  .location-info .fw-bold {
+    color: var(--primary-color);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+  }
+  
+  #gps-status.fa-check-circle {
+    color: var(--primary-color) !important;
+  }
+  
+  #gps-status.fa-times-circle {
+    color: #ff5050 !important;
+  }
+  
+  #distance-info.inside-radius {
+    color: var(--primary-color) !important;
+  }
+  
+  #distance-info.outside-radius {
+    color: #ff5050 !important;
+  }
+  
+  #presensi-status.allowed {
+    color: var(--primary-color) !important;
+  }
+  
+  #presensi-status.not-allowed {
+    color: #ff5050 !important;
   }
 
 
@@ -725,11 +787,13 @@ margin-bottom: 20px;
 
     <div class="row row-deck g-4">
 
-      <div class="col-lg-12 text-center">
+      <div class="col-lg-12 text-center mb-4">
 
         <img src="/assets/img/foto_pegawai/<?= $_SESSION['foto'] ?>" alt="Employee Photo" height="150">
 
       </div>
+
+      
 
       <div class="col-md-6 col-lg-4">
 
@@ -1081,22 +1145,48 @@ margin-bottom: 20px;
 
       </div>
 
-      <!-- <div class="col-lg-12">
-
+      <div class="col-lg-12 mb-4">
         <div class="card">
-
-          <div class="card-header text-center">Lokasi</div>
-
+          <div class="card-header text-center">Lokasi & Status Presensi</div>
           <div class="card-body">
-
-            <div id="map" style="width: 100%; height: 400px; border-radius: 15px; border: 1px solid var(--border-color);"></div>
-
+            <div class="row">
+              <div class="col-md-4">
+                <h6 class="text-center mb-3" style="color: var(--primary-color);">Posisi Anda</h6>
+                <div class="location-info">
+                  <small class="text-muted">Latitude:</small>
+                  <div id="current-lat" class="fw-bold">Mendeteksi...</div>
+                </div>
+                <div class="location-info mt-2">
+                  <small class="text-muted">Longitude:</small>
+                  <div id="current-lng" class="fw-bold">Mendeteksi...</div>
+                </div>
+                <div class="location-info mt-2">
+                  <small class="text-muted">Status GPS:</small>
+                  <div id="gps-status" class="fw-bold">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Mencari GPS...
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <h6 class="text-center mb-3" style="color: var(--primary-color);">Jarak & Status</h6>
+                <div class="location-info">
+                  <small class="text-muted">Jarak ke Kantor:</small>
+                  <div id="distance-info" class="fw-bold">-</div>
+                </div>
+                <div class="location-info mt-3">
+                  <small class="text-muted">Status Presensi:</small>
+                  <div id="presensi-status" class="fw-bold">-</div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <h6 class="text-center mb-3" style="color: var(--primary-color);">Peta Lokasi</h6>
+                <div id="map" style="height: 300px; width: 100%; aspect-ratio: 1/1; z-index: 1;"></div>
+              </div>
+            </div>
           </div>
-
         </div>
-
-      </div> -->
-
+      </div>
+      
     </div>
 
   </div>
@@ -1188,7 +1278,29 @@ margin-bottom: 20px;
 
     $('#longitude_pegawai').val(position.coords.longitude);
 
+    // Update lokasi info card
+    $('#current-lat').text(position.coords.latitude.toFixed(8));
+    $('#current-lng').text(position.coords.longitude.toFixed(8));
+    $('#gps-status').html('<i class="fa-solid fa-check-circle"></i> GPS Aktif');
 
+    // Hitung jarak ke kantor
+    let latitude_ktr = <?= $latitude_kantor ?>;
+    let longitude_ktr = <?= $longitude_kantor ?>;
+    let radius_ktr = <?= $radius ?>;
+    
+    let distance = calculateDistance(position.coords.latitude, position.coords.longitude, latitude_ktr, longitude_ktr);
+    
+    $('#distance-info').text(distance + ' meter');
+    
+    if (distance <= radius_ktr) {
+      $('#distance-info').removeClass('outside-radius').addClass('inside-radius');
+      $('#presensi-status').removeClass('not-allowed').addClass('allowed');
+      $('#presensi-status').html('<i class="fa-solid fa-check-circle"></i> Dalam Area');
+    } else {
+      $('#distance-info').removeClass('inside-radius').addClass('outside-radius');
+      $('#presensi-status').removeClass('allowed').addClass('not-allowed');
+      $('#presensi-status').html('<i class="fa-solid fa-times-circle"></i> Luar Area');
+    }
 
     // Mengisi koordinat untuk form pengajuan
 
@@ -1209,35 +1321,39 @@ margin-bottom: 20px;
 
 
   function handleGeolocationError(error) {
+    $('#current-lat').text('Tidak tersedia');
+    $('#current-lng').text('Tidak tersedia');
+    $('#gps-status').html('<i class="fa-solid fa-times-circle"></i> GPS Error');
+    $('#distance-info').text('-');
+    $('#presensi-status').html('<i class="fa-solid fa-exclamation-triangle"></i> Error');
 
     switch (error.code) {
-
       case error.PERMISSION_DENIED:
-
-        alert("User denied the request for geolocation.");
-
+        $('#gps-status').html('<i class="fa-solid fa-times-circle"></i> GPS Ditolak');
         break;
-
       case error.POSITION_UNAVAILABLE:
-
-        alert("Location information is unavailable.");
-
+        $('#gps-status').html('<i class="fa-solid fa-times-circle"></i> Lokasi Tidak Ada');
         break;
-
       case error.TIMEOUT:
-
-        alert("The request to get user location timed out.");
-
+        $('#gps-status').html('<i class="fa-solid fa-times-circle"></i> GPS Timeout');
         break;
-
       case error.UNKNOWN_ERROR:
-
-        alert("An unknown error occurred.");
-
+        $('#gps-status').html('<i class="fa-solid fa-times-circle"></i> Error GPS');
         break;
-
     }
+  }
 
+  // Fungsi untuk menghitung jarak
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radius bumi dalam km
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c;
+    return Math.round(d * 1000); // Konversi ke meter
   }
 
 
@@ -1318,5 +1434,76 @@ margin-bottom: 20px;
 </script>
 
 
+
+<script>
+// Inisialisasi peta lokasi presensi
+console.log('Initializing home map...');
+
+// Tunggu GPS selesai mendapatkan lokasi
+setTimeout(function() {
+    let latitude_peg = $('#latitude_pegawai').val();
+    let longitude_peg = $('#longitude_pegawai').val();
+    let latitude_ktr = <?= $latitude_kantor ?>;
+    let longitude_ktr = <?= $longitude_kantor ?>;
+    let radius_ktr = <?= $radius ?>;
+
+    console.log('Home coordinates:', latitude_peg, longitude_peg, latitude_ktr, longitude_ktr, radius_ktr);
+
+    if (latitude_ktr && longitude_ktr) {
+        try {
+            let map = L.map('map').setView([latitude_ktr, longitude_ktr], 16);
+            console.log('Home map initialized');
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Marker lokasi kantor
+            var marker_kantor = L.marker([latitude_ktr, longitude_ktr]).addTo(map)
+                .bindPopup("Lokasi Kantor<br>Radius: " + radius_ktr + " meter")
+                .openPopup();
+
+            // Area radius kantor
+            var circle = L.circle([latitude_ktr, longitude_ktr], {
+                color: '#00e0b3',
+                fillColor: '#00e0b3',
+                fillOpacity: 0.2,
+                radius: radius_ktr
+            }).addTo(map);
+
+            // Marker lokasi user (selalu tampilkan jika GPS aktif)
+            if (latitude_peg && longitude_peg) {
+                var marker_user = L.marker([latitude_peg, longitude_peg], {
+                    icon: L.icon({
+                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                        iconSize: [25, 41],
+                        iconAnchor: [12, 41],
+                        popupAnchor: [1, -34],
+                        shadowSize: [41, 41]
+                    })
+                }).addTo(map)
+                    .bindPopup("Posisi Anda<br>Jarak: " + calculateDistance(latitude_peg, longitude_peg, latitude_ktr, longitude_ktr) + " meter")
+                    .openPopup();
+            }
+
+            // Tambahkan kontrol scale
+            L.control.scale().addTo(map);
+
+            // Force map to redraw
+            setTimeout(function() {
+                map.invalidateSize();
+                console.log('Home map size invalidated');
+            }, 100);
+
+        } catch (error) {
+            console.error('Error initializing home map:', error);
+        }
+    } else {
+        console.error('Kantor coordinates not available');
+    }
+}, 1000); // Tunggu 1 detik untuk GPS
+</script>
 
 <?php include('../layout/footer.php'); ?>

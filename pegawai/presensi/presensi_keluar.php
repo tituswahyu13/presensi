@@ -182,10 +182,21 @@ $jarak_meter = $jarak_km * 1000;
     }
     
     #map {
-        height: 350px;
+        height: 350px !important;
+        width: 100% !important;
+        min-height: 350px !important;
         margin-top: 30px;
         border-radius: 15px;
         border: 1px solid var(--border-color);
+        z-index: 1 !important;
+        background: #1a1a1a !important;
+        position: relative !important;
+    }
+    
+    .leaflet-container {
+        height: 100% !important;
+        width: 100% !important;
+        background: #1a1a1a !important;
     }
     
     /* Modifikasi untuk pop-up Leaflet */
@@ -245,7 +256,7 @@ $jarak_meter = $jarak_km * 1000;
                 <div class="card">
                     <div class="card-header text-center">Lokasi Presensi</div>
                     <div class="card-body">
-                        <div id="map"></div>
+                        <div id="map" style="height: 350px; width: 100%; min-height: 350px; z-index: 1;"></div>
                     </div>
                 </div>
             </div>
@@ -253,6 +264,7 @@ $jarak_meter = $jarak_km * 1000;
     </div>
 
     <script language="JavaScript">
+        // Inisialisasi webcam
         Webcam.set({
             width: 280,
             height: 360,
@@ -264,8 +276,8 @@ $jarak_meter = $jarak_km * 1000;
         });
         Webcam.attach('#my_camera');
 
+        // Event listener untuk tombol foto
         document.getElementById('ambil-foto').addEventListener('click', function() {
-
             let id = document.getElementById('id').value;
             let tanggal_keluar = document.getElementById('tanggal_keluar').value;
             let jam_keluar = document.getElementById('jam_keluar').value;
@@ -273,7 +285,6 @@ $jarak_meter = $jarak_km * 1000;
             Webcam.snap(function(data_uri) {
                 var xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
-                    // document.getElementById('my_result').innerHTML = '<img src="' + data_uri + '"/>';
                     if (xhttp.readyState == 4 && xhttp.status == 200) {
                         window.location.href = '../home/home.php';
                     }
@@ -289,6 +300,9 @@ $jarak_meter = $jarak_km * 1000;
             });
         });
 
+        // Inisialisasi peta langsung setelah webcam
+        console.log('Initializing map...');
+        
         // map leaflet js
         let latitude_ktr = <?= $latitude_kantor ?>;
         let longitude_ktr = <?= $longitude_kantor ?>;
@@ -296,29 +310,86 @@ $jarak_meter = $jarak_km * 1000;
         let longitude_peg = <?= $longitude_pegawai ?>;
         let radius_ktr = <?= $radius ?>;
 
-        let map = L.map('map').setView([latitude_ktr, longitude_ktr], 16);
+        console.log('Coordinates:', latitude_ktr, longitude_ktr, latitude_peg, longitude_peg, radius_ktr);
+
+        // Tunggu sedikit agar DOM siap
+        setTimeout(function() {
+            try {
+                let map = L.map('map').setView([latitude_ktr, longitude_ktr], 16);
+                console.log('Map object created successfully');
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        var marker = L.marker([latitude_peg, longitude_peg]).addTo(map).bindPopup("Posisi anda saat ini").openPopup();
+        // Marker lokasi kantor dengan radius
+        var marker_kantor = L.marker([latitude_ktr, longitude_ktr]).addTo(map)
+            .bindPopup("Lokasi Kantor<br>Radius: " + radius_ktr + " meter")
+            .openPopup();
 
         var circle = L.circle([latitude_ktr, longitude_ktr], {
-            color: 'var(--primary-color)',
-            fillColor: 'var(--primary-color)',
+            color: '#00e0b3',
+            fillColor: '#00e0b3',
             fillOpacity: 0.2,
             radius: radius_ktr
         }).addTo(map);
 
-        // Tambahkan kontrol untuk fokus ke lokasi pengguna
-        map.locate({setView: true, maxZoom: 16});
+        // Marker lokasi user saat ini
+        var marker_user = L.marker([latitude_peg, longitude_peg], {
+            icon: L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            })
+        }).addTo(map)
+            .bindPopup("Posisi Anda<br>Jarak: " + <?= $jarak_meter ?> + " meter")
+            .openPopup();
+
+        // Tambahkan kontrol scale
+        L.control.scale().addTo(map);
+
+        // Force map to redraw after container is ready
+        setTimeout(function() {
+            map.invalidateSize();
+            console.log('Map size invalidated');
+        }, 100);
+
+        // Tambahkan kontrol untuk fokus ke lokasi pengguna (opsional)
+        map.locate({setView: false, watch: false});
         function onLocationFound(e) {
-            L.marker(e.latlng).addTo(map)
-                .bindPopup("Lokasi Akurat Anda").openPopup();
-            L.circle(e.latlng, e.accuracy).addTo(map);
+            // Jika lokasi GPS lebih akurat, update marker
+            var currentDistance = calculateDistance(
+                latitude_peg, longitude_peg, 
+                e.latlng.lat, e.latlng.lng
+            );
+            
+            if (currentDistance < 50) { // Jika perbedaan kurang dari 50m
+                marker_user.setLatLng(e.latlng);
+                marker_user.bindPopup("Lokasi GPS Akurat<br>Jarak: " + 
+                    calculateDistance(latitude_ktr, longitude_ktr, e.latlng.lat, e.latlng.lng) + " meter").openPopup();
+            }
         }
         map.on('locationfound', onLocationFound);
+
+        // Fungsi untuk menghitung jarak
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            var R = 6371; // Radius bumi dalam km
+            var dLat = (lat2 - lat1) * Math.PI / 180;
+            var dLon = (lon2 - lon1) * Math.PI / 180;
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            var d = R * c;
+            return Math.round(d * 1000); // Konversi ke meter
+        }
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        }, 500); // Tunggu 500ms
     </script>
 
 <?php } ?>
